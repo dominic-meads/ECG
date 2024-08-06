@@ -27,7 +27,7 @@
 module MCP3202_SPI_500sps #(
     parameter FCLK = 100e6, // clk frequency
     parameter SGL = 1,      // sets ADC to single-ended
-    parameter ODD = 1       // sets ADC sample input to channel 0
+    parameter ODD = 0       // sets ADC sample input to channel 0
     )(
     input clk,
     input rst_n,
@@ -46,7 +46,7 @@ module MCP3202_SPI_500sps #(
     
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
     localparam TCSH_CLK_CNTS_MAX = 2e-3 * FCLK - 15300; // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
-    reg[31:0] r_tchs_clk_cnts_max = TCSH_CLK_CNTS_MAX;
+    reg[31:0] r_tcsh_clk_cnts_max = TCSH_CLK_CNTS_MAX;
 
     // additional MOSI data
 	localparam START = 1'b1;           // start bit
@@ -80,7 +80,7 @@ module MCP3202_SPI_500sps #(
                 r_tcsh_clk_cnts <= 0;
             else 
                 begin
-                  if (r_tcsh_clk_cnts < r_tchs_clk_cnts_max - 1) //[Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
+                  if (r_tcsh_clk_cnts < r_tcsh_clk_cnts_max - 1) //[Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
 
                         r_tcsh_clk_cnts <= r_tcsh_clk_cnts + 1;
                     else 
@@ -135,7 +135,7 @@ module MCP3202_SPI_500sps #(
                                 r_sck_en           <= 1'b0;
                                 
                                 // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
-                              if (r_tcsh_clk_cnts == r_tchs_clk_cnts_max - 1)  // only move to next state if the total disable time is met
+                              if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                                 else
                                     r_state <= INIT;
@@ -185,7 +185,7 @@ module MCP3202_SPI_500sps #(
                                 r_sck_en           <= 1'b0;
                                 
                                 // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
-                              if (r_tcsh_clk_cnts == r_tchs_clk_cnts_max - 1)  // only move to next state if the total disable time is met
+                              if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                             end
 
