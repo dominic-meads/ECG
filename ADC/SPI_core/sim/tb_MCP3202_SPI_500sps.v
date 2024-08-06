@@ -40,7 +40,7 @@ module tb_MCP3202_SPI_500sps;
   integer wait_sck_cycle      = (1/FCLK)*900e9;
   integer wait_half_sck_cycle = (1/FCLK)*450e9;
   
-  reg [11:0] r_tst_smpl = 12'hd73; // miso test sample word 
+  reg [11:0] r_tst_smpl = 12'b11111011100; // miso test sample word 
 
   reg [5:0] r_tb_sck_cntr = 0;
   
@@ -173,7 +173,6 @@ module tb_MCP3202_SPI_500sps;
           wait(sck) wait(~sck)  // TX bit 0 of sample on negedge SCK
             miso = r_tst_smpl[0];
 
-          // PUT IN DATA VALID FLAG
           wait(cs)
             begin 
               $display("All bits TX'ed. Data now valid. Sample time = %d", $time);
