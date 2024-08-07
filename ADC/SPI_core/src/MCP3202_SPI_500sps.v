@@ -59,7 +59,7 @@ module MCP3202_SPI_500sps #(
 
     // output registers
     reg r_mosi = 0; 
-    reg [11:0] r_rx_data = 12'h000;
+    reg [12:0] r_rx_data = 13'h0000; // 1 null bit and 12 data bits
     reg r_cs = 1;       	         // disable CS to start
     reg r_dv = 0;                    // DATA_VALID register
     
@@ -119,7 +119,17 @@ module MCP3202_SPI_500sps #(
     always @ (posedge clk, negedge rst_n)
         begin
             if (~rst_n)
-                r_state <= INIT;
+                begin
+                    r_state <= INIT;
+                
+                    r_cs      <= 1'b1;
+                    r_mosi    <= 1'b0;
+                    r_rx_data <= 13'h0000;
+                    r_dv      <= 1'b0;
+                                
+                    r_tcsh_clk_cntr_en <= 1'b0;
+                    r_sck_en           <= 1'b0;
+                end
             else 
                 begin 
                     case (r_state) 
@@ -128,7 +138,7 @@ module MCP3202_SPI_500sps #(
                             begin 
                                 r_cs      <= 1'b1;
                                 r_mosi    <= 1'b0;
-                                r_rx_data <= 12'h000;
+                                r_rx_data <= 13'h0000;
                                 r_dv      <= 1'b0;
                                 
                                 r_tcsh_clk_cntr_en <= 1'b1;
@@ -145,7 +155,7 @@ module MCP3202_SPI_500sps #(
                             begin 
                                 r_cs      <= 1'b0;
                                 r_mosi    <= r_tx_data[r_sck_cntr];
-                                r_rx_data <= 12'h000;
+                                r_rx_data <= 13'h0000;
                                 r_dv      <= 1'b0;
                                 
                                 r_tcsh_clk_cntr_en <= 1'b0;
@@ -162,7 +172,7 @@ module MCP3202_SPI_500sps #(
                                 r_cs   <= 1'b0;
                                 r_mosi <= 1'b0;
                                 if (r_clk_cnts_per_sck == 449)
-                                    r_rx_data[11-(r_sck_cntr-4)] <= miso; 
+                                    r_rx_data[12-(r_sck_cntr-4)] <= miso; 
                             
                                 r_dv   <= 1'b0;
                                 
@@ -197,7 +207,7 @@ module MCP3202_SPI_500sps #(
 
     assign cs = r_cs;
     assign mosi = r_mosi;
-    assign data = r_rx_data;
+    assign data = r_rx_data[11:0];
     assign dv = r_dv;
     assign sck = (r_clk_cnts_per_sck <= 449 && r_sck_en) ? 0:1;
 
