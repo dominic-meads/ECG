@@ -134,11 +134,14 @@ module tb_MCP3202_SPI_500sps;
                 $display("set to LSBF mode");
             end
 
-          wait(~sck)  // TX MSB of sample on negedge SCK
+          wait(~sck)  // TX null bit on negedge SCK after enable time = 200 ns (max)
             begin 
               #200 // TEN max (SCK falling edge to DOUT enable)
-              miso = r_tst_smpl[11];
+              miso = 0; 
             end
+
+          wait(sck) wait(~sck)  // TX MSB of sample on negedge SCK
+            miso = r_tst_smpl[11];
 
           wait(sck) wait(~sck)  // TX bit 10 of sample on negedge SCK
             miso = r_tst_smpl[10];
@@ -173,7 +176,7 @@ module tb_MCP3202_SPI_500sps;
           wait(sck) wait(~sck)  // TX bit 0 of sample on negedge SCK
             miso = r_tst_smpl[0];
 
-          // PUT IN DATA VALID FLAG
+// PUT IN DATA VALID FLAG
           wait(cs)
             begin 
               $display("All bits TX'ed. Data now valid. Sample time = %d", $time);
