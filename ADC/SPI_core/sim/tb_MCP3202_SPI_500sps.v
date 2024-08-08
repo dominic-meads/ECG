@@ -52,21 +52,8 @@ module tb_MCP3202_SPI_500sps;
   integer sck_period = 0;
   
 
-  // DO I NEED THIS? ADD IN FOREVER CONDITIONS TO CHECK FOR UNKNOWNS AND HIGH Z
-  always @ (negedge sck)
-    begin
-      if (~rst_n)
-        r_tb_sck_cntr <= 0;
-      else 
-        begin 
-          if (r_tb_sck_cntr < 16)
-            r_tb_sck_cntr <= r_tb_sck_cntr + 1;
-          else 
-            r_tb_sck_cntr <= 0;
-        end 
-    end 
+  // ADD IN FOREVER CONDITIONS TO CHECK FOR UNKNOWNS AND HIGH Z
       
-  
   initial 
     begin 
       clk   = 1'b0;
@@ -176,13 +163,13 @@ module tb_MCP3202_SPI_500sps;
           wait(sck) wait(~sck)  // TX bit 0 of sample on negedge SCK
             miso = r_tst_smpl[0];
 
-// PUT IN DATA VALID FLAG
           wait(cs)
             begin 
-              $display("All bits TX'ed. Data now valid. Sample time = %d", $time);
+              if (dv)
+                $display("All bits TX'ed. Data now valid. Sample time = %d", $time);
               if (data == r_tst_smpl)
                 $display("SIMULATION PASSED: Module sample accurate");
-              else
+              else if (data != r_tst_smpl)
                 $fatal(1,"SIMULATION FAILED: Module output data does not match test sample");        
             end 
           #30000
