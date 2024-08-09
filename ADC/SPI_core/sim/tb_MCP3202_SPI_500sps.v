@@ -53,16 +53,12 @@ module tb_MCP3202_SPI_500sps;
   
 
   // ADD IN FOREVER CONDITIONS TO CHECK FOR UNKNOWNS AND HIGH Z
-      
-  initial 
-    begin 
-      clk   = 1'b0;
-      rst_n = 1'b0;
-      miso  = 1'bz;
-      #25
-      rst_n = 1'b1;
-      TCSH_start = $time;
 
+  task tx_sample;
+    input [11:0] sample;
+    input cs, mosi, sck, dv;
+    output miso;
+    begin
       wait (~cs) // cs low, start conversion. Check TCSH timing
         begin
           TCSH = $time - TCSH_start;
@@ -128,40 +124,40 @@ module tb_MCP3202_SPI_500sps;
             end
 
           wait(sck) wait(~sck)  // TX MSB of sample on negedge SCK
-            miso = r_tst_smpl[11];
+            miso = sample[11];
 
           wait(sck) wait(~sck)  // TX bit 10 of sample on negedge SCK
-            miso = r_tst_smpl[10];
+            miso = sample[10];
 
           wait(sck) wait(~sck)  // TX bit 9 of sample on negedge SCK
-            miso = r_tst_smpl[9];
+            miso = sample[9];
 
           wait(sck) wait(~sck)  // TX bit 8 of sample on negedge SCK
-            miso = r_tst_smpl[8];
+            miso = sample[8];
 
           wait(sck) wait(~sck)  // TX bit 7 of sample on negedge SCK
-            miso = r_tst_smpl[7];
+            miso = sample[7];
 
           wait(sck) wait(~sck)  // TX bit 6 of sample on negedge SCK
-            miso = r_tst_smpl[6];
+            miso = sample[6];
 
           wait(sck) wait(~sck)  // TX bit 5 of sample on negedge SCK
-            miso = r_tst_smpl[5];
+            miso = sample[5];
 
           wait(sck) wait(~sck)  // TX bit 4 of sample on negedge SCK
-            miso = r_tst_smpl[4];
+            miso = sample[4];
 
           wait(sck) wait(~sck)  // TX bit 3 of sample on negedge SCK
-            miso = r_tst_smpl[3];
+            miso = sample[3];
 
           wait(sck) wait(~sck)  // TX bit 2 of sample on negedge SCK
-            miso = r_tst_smpl[2];
+            miso = sample[2];
 
           wait(sck) wait(~sck)  // TX bit 1 of sample on negedge SCK
-            miso = r_tst_smpl[1];
+            miso = sample[1];
 
           wait(sck) wait(~sck)  // TX bit 0 of sample on negedge SCK
-            miso = r_tst_smpl[0];
+            miso = sample[0];
 
           wait(cs)
             begin 
@@ -171,9 +167,25 @@ module tb_MCP3202_SPI_500sps;
                 $display("SIMULATION PASSED: Module sample accurate");
               else if (data != r_tst_smpl)
                 $fatal(1,"SIMULATION FAILED: Module output data does not match test sample");        
-            end 
+            end
+        end
+    end 
+  endtask
+      
+      
+  initial 
+    begin 
+      clk   = 1'b0;
+      rst_n = 1'b0;
+      miso  = 1'bz;
+      #25
+      rst_n = 1'b1;
+      TCSH_start = $time;
+
+      tx_sample(r_tst_smpl, cs, mosi, sck, dv, miso);
+
           #30000
           $finish(2);
         end
-    end
+    //end
 endmodule
