@@ -46,11 +46,11 @@ module MCP3202_SPI_500sps #(
     
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
     localparam TCSH_CLK_CNTS_MAX = 2e-3 * FCLK - 15300; // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
-    reg[31:0] r_tcsh_clk_cnts_max = TCSH_CLK_CNTS_MAX;
+    reg[$clog2(TCSH_CLK_CNTS_MAX)-1:0] r_tcsh_clk_cnts_max = TCSH_CLK_CNTS_MAX;
 
     // additional MOSI data
-	localparam START = 1'b1;           // start bit
-	localparam	MSBF = 1'b1;           // sets ADC to transmit MSB first
+    localparam START = 1'b1;           // start bit
+    localparam	MSBF = 1'b1;           // sets ADC to transmit MSB first
 
     reg [1:0] r_state = INIT;
 
@@ -60,17 +60,17 @@ module MCP3202_SPI_500sps #(
     // output registers
     reg r_mosi = 0; 
     reg [12:0] r_rx_data = 13'h0000; // 1 null bit and 12 data bits
-    reg r_cs = 1;       	         // disable CS to start
+    reg r_cs = 1;       	     // disable CS to start
     reg r_dv = 0;                    // DATA_VALID register
     
-    reg[31:0] r_tcsh_clk_cnts = 0;
+    reg[$clog2(TCSH_CLK_CNTS_MAX)-1:0] r_tcsh_clk_cnts = 0;
     reg r_tcsh_clk_cntr_en = 0;
     
     // input clk cycles per single spi clk cycle
-    reg[31:0] r_clk_cnts_per_sck = 0;
+    reg[9:0] r_clk_cnts_per_sck = 0;
     
     // spi clk cycle counter
-    reg[31:0] r_sck_cntr = 0;
+    reg[4:0] r_sck_cntr = 0;
     reg r_sck_en = 0;
     
     // TCSH counter
