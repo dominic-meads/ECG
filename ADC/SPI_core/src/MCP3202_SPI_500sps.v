@@ -43,7 +43,10 @@ module MCP3202_SPI_500sps #(
     localparam TX   = 2'b01;  // set the sample channel, sampling mode, etc...
     localparam RX   = 2'b10;  // convert the bitstream into parellel word
     localparam IDLE = 2'b11;  // CS is high
-    
+
+    reg [1:0] r_state = INIT;
+
+    //[Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
     localparam TCSH_CLK_CNTS_MAX = 2e-3 * FCLK - 15300; // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
     reg[$clog2(TCSH_CLK_CNTS_MAX)-1:0] r_tcsh_clk_cnts_max = TCSH_CLK_CNTS_MAX;
@@ -52,10 +55,8 @@ module MCP3202_SPI_500sps #(
     localparam START = 1'b1;           // start bit
     localparam	MSBF = 1'b1;           // sets ADC to transmit MSB first
 
-    reg [1:0] r_state = INIT;
-
     // DATA TO BE TX'ed VIA MOSI LINE
-    reg [3:0] r_tx_data = {MSBF, ODD[0], SGL[0], START}; // FIX THIS CONCAYENATING PARAMTERS???
+    reg [3:0] r_tx_data = {MSBF, ODD[0], SGL[0], START};
 
     // output registers
     reg r_mosi = 0; 
@@ -80,7 +81,7 @@ module MCP3202_SPI_500sps #(
                 r_tcsh_clk_cnts <= 0;
             else 
                 begin
-                  if (r_tcsh_clk_cnts < r_tcsh_clk_cnts_max - 1) //[Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
+                  if (r_tcsh_clk_cnts < r_tcsh_clk_cnts_max - 1) 
 
                         r_tcsh_clk_cnts <= r_tcsh_clk_cnts + 1;
                     else 
@@ -144,7 +145,6 @@ module MCP3202_SPI_500sps #(
                                 r_tcsh_clk_cntr_en <= 1'b1;
                                 r_sck_en           <= 1'b0;
                                 
-                                // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
                               if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                                 else
@@ -194,7 +194,6 @@ module MCP3202_SPI_500sps #(
                                 r_tcsh_clk_cntr_en <= 1'b1;
                                 r_sck_en           <= 1'b0;
                                 
-                                // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
                               if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                             end
