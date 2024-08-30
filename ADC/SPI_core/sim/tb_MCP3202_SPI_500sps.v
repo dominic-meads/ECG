@@ -33,7 +33,7 @@ module tb_MCP3202_SPI_500sps;
   localparam SGL   = 1;     // single-ended mode
   localparam ODD   = 0;     // Data Aquisition on Channel 0
   
-  MCP3202_SPI_500sps #(FCLK,FSMPL,SGL,ODD) uut (clk, rst_n, miso, mosi, sck, cs, data, dv);
+  MCP3202_SPI #(FCLK,FSMPL,SGL,ODD) uut (clk, rst_n, miso, mosi, sck, cs, data, dv);
   
   reg [11:0] r_tst_smpl = 12'h75f; // miso test sample word 
   
