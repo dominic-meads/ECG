@@ -31,7 +31,7 @@ module MCP3202_SPI_500sps #(
     )(
     input clk,
     input rst_n,
-    input miso,
+    input reg miso,
     output mosi,
     output sck,
     output cs,
