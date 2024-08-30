@@ -9,8 +9,8 @@
 // Project Name: 
 // Target Devices: 7 zeries
 // Tool Versions: 
-// Description: An SPI master for an MCP3202 ADC. It has a sample rate of 500 samples/sec and 
-//              will be used for an ECG demo. The ADC is set to operate in single-ended sampling
+// Description: An SPI master for an MCP3202 ADC. It has a configurable sample rate (set here to 
+//              500 samples/sec for an ECG demo. The ADC is set to operate in single-ended sampling
 //              "MSB first" mode on input channel 0. The ADC can be set to differential mode and 
 //              channel can be changed (see "parameters"), but "MSB first" mode is always selected
 //
@@ -25,9 +25,10 @@
 
 
 module MCP3202_SPI_500sps #(
-    parameter FCLK = 100e6, // clk frequency
-    parameter SGL = 1,      // sets ADC to single-ended
-    parameter ODD = 0       // sets ADC sample input to channel 0
+    parameter FCLK  = 100e6, // clk frequency
+    parameter FSMPL = 500,   // sampling freqeuncy 
+    parameter SGL   = 1,     // sets ADC to single-ended
+    parameter ODD   = 0      // sets ADC sample input to channel 0
     )(
     input clk,
     input rst_n,
@@ -47,8 +48,8 @@ module MCP3202_SPI_500sps #(
     reg [1:0] r_state = INIT;
 
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
-    localparam param_tcsh_clk_cnts_max = 2e-3 * FCLK - 15300; 
-    integer TCSH_CLK_CNTS_MAX = $rtoi(param_tcsh_clk_cnts_max);
+    real real_tcsh_clk_cnts_max = (1/FSMPL) * FCLK - 15300; 
+    integer TCSH_CLK_CNTS_MAX = $rtoi(real_tcsh_clk_cnts_max);
 
     // additional MOSI data
     localparam START = 1'b1;           // start bit
