@@ -46,10 +46,9 @@ module MCP3202_SPI_500sps #(
 
     reg [1:0] r_state = INIT;
 
-    //[Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
-    localparam TCSH_CLK_CNTS_MAX = 2e-3 * FCLK - 15300; // [Synth 8-502] non-constant real-valued expression is not supported ["C:/Users/demea/Xilinx_projects/Vivado-Projects/SPI_MCP3202_passthrough/SPI_MCP3202_passthrough.srcs/sources_1/new/SPI_MCP3202_V3.v":82]
-    reg[$clog2(TCSH_CLK_CNTS_MAX)-1:0] r_tcsh_clk_cnts_max = TCSH_CLK_CNTS_MAX;
+    localparam param_tcsh_clk_cnts_max = 2e-3 * FCLK - 15300; 
+    integer TCSH_CLK_CNTS_MAX = $rtoi(param_tcsh_clk_cnts_max);
 
     // additional MOSI data
     localparam START = 1'b1;           // start bit
@@ -81,7 +80,7 @@ module MCP3202_SPI_500sps #(
                 r_tcsh_clk_cnts <= 0;
             else 
                 begin
-                  if (r_tcsh_clk_cnts < r_tcsh_clk_cnts_max - 1) 
+                  if (r_tcsh_clk_cnts < TCSH_CLK_CNTS_MAX - 1) 
 
                         r_tcsh_clk_cnts <= r_tcsh_clk_cnts + 1;
                     else 
@@ -145,7 +144,7 @@ module MCP3202_SPI_500sps #(
                                 r_tcsh_clk_cntr_en <= 1'b1;
                                 r_sck_en           <= 1'b0;
                                 
-                              if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
+                              if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                                 else
                                     r_state <= INIT;
@@ -194,7 +193,7 @@ module MCP3202_SPI_500sps #(
                                 r_tcsh_clk_cntr_en <= 1'b1;
                                 r_sck_en           <= 1'b0;
                                 
-                              if (r_tcsh_clk_cnts == r_tcsh_clk_cnts_max - 1)  // only move to next state if the total disable time is met
+                              if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
                                     r_state <= TX;
                             end
 
