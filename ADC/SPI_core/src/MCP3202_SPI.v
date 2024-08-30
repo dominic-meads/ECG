@@ -24,7 +24,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module MCP3202_SPI_500sps #(
+module MCP3202_SPI #(
     parameter FCLK  = 100e6, // clk frequency
     parameter FSMPL = 500,   // sampling freqeuncy 
     parameter SGL   = 1,     // sets ADC to single-ended
