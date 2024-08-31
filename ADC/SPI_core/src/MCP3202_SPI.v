@@ -32,7 +32,7 @@ module MCP3202_SPI #(
     )(
     input clk,
     input rst_n,
-    input reg miso,
+    input miso,
     output mosi,
     output sck,
     output cs,
