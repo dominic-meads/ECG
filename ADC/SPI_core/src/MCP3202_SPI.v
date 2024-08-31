@@ -45,7 +45,7 @@ module MCP3202_SPI #(
     localparam RX   = 2'b10;  // convert the bitstream into parellel word
     localparam IDLE = 2'b11;  // CS is high
 
-    reg [1:0] r_state = INIT;
+    reg [1:0] r_current_state, r_next_state;
 
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
     localparam integer TCSH_CLK_CNTS_MAX = (FCLK/FSMPL) - 15300; 
@@ -56,6 +56,9 @@ module MCP3202_SPI #(
 
     // DATA TO BE TX'ed VIA MOSI LINE
     reg [3:0] r_tx_data = {MSBF, ODD[0], SGL[0], START};
+    
+    // input registers
+    reg r_miso = 0;
 
     // output registers
     reg r_mosi = 0; 
@@ -72,6 +75,15 @@ module MCP3202_SPI #(
     // spi clk cycle counter
     reg[4:0] r_sck_cntr = 0;
     reg r_sck_en = 0;
+    
+    // register miso
+    always @ (posedge clk or negedge rst_n)
+        begin 
+            if (~rst_n)
+                r_miso <= 0;
+            else 
+                r_miso <= miso;
+        end 
     
     // TCSH counter
     always @ (posedge clk or negedge rst_n)
@@ -114,94 +126,115 @@ module MCP3202_SPI #(
                     else if (r_sck_cntr == 16 && r_clk_cnts_per_sck == 899)
                         r_sck_cntr <= 0;
                 end
-        end 
+        end
+
+    // state machine
+    always @ (*)
+        begin 
+            case (r_current_state) 
     
+                INIT :
+                    begin 
+                        if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
+                            r_next_state = TX;
+                        else
+                            r_next_state = r_current_state;
+                    end
+            
+                TX : 
+                    begin 
+                        if (r_sck_cntr == 3 && r_clk_cnts_per_sck == 899)
+                            r_next_state = RX;
+                        else
+                            r_next_state = r_current_state;
+                    end 
+
+                RX : 
+                    begin 
+                        if (r_sck_cntr == 16 && r_clk_cnts_per_sck == 898)
+                            r_next_state = IDLE;
+                        else
+                            r_next_state = r_current_state;  
+                    end
+
+                IDLE : 
+                    begin
+                        if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
+                            r_next_state = TX;
+                        else
+                            r_next_state = r_current_state;
+                    end
+
+                default : r_next_state = INIT;
+            endcase
+        end
+
+    // Output logic 
+    always @ (*)
+        begin
+            if (r_current_state == INIT)
+                begin 
+                    r_cs      = 1'b1;
+                    r_mosi    = 1'b0;
+                    r_rx_data = 13'h0000;
+                    r_dv      = 1'b0;  // data is NOT valid in INIT state (no sample has occurred yet)
+                    
+                    r_tcsh_clk_cntr_en = 1'b1;  // count the time the ADC needs to be disabled to meet FSMPL
+                    r_sck_en           = 1'b0;  // sck not active at this time
+                end
+
+            else if (r_current_state == TX)
+                begin 
+                    r_cs      = 1'b0;  // enable ADC
+                    r_mosi    = r_tx_data[r_sck_cntr];  // ship out mosi bits
+                    r_rx_data = 13'h0000;
+                    r_dv      = 1'b0;
+                    
+                    r_tcsh_clk_cntr_en = 1'b0;
+                    r_sck_en           = 1'b1;  // start counting sck cycles (17 in total per sample conversion)
+                end
+
+            else if (r_current_state == RX)
+                begin            
+                    r_cs   = 1'b0;
+                    r_mosi = 1'b0;
+                    if (r_clk_cnts_per_sck == 449)  // Register miso bits at middle of sck period (most stable)
+                        r_rx_data[12-(r_sck_cntr-4)] = r_miso; 
+                    r_dv   = 1'b0;
+                    
+                    r_tcsh_clk_cntr_en = 1'b0;
+                    r_sck_en           = 1'b1;
+                end
+
+            else if (r_current_state == IDLE)
+                begin
+                    r_cs      = 1'b1;  // disable ADC
+                    r_mosi    = 1'b0;
+                    r_dv      = 1'b1;  // sample data is now valid
+                    
+                    r_tcsh_clk_cntr_en = 1'b1;  // start counting ADC disable time again
+                    r_sck_en           = 1'b0;
+                end
+
+            /* else
+                begin
+                    r_cs      = 1'b1;
+                    r_mosi    = 1'b0;
+                    r_rx_data = 13'h0000;
+                    r_dv      = 1'b0;  
+                                
+                    r_tcsh_clk_cntr_en = 1'b0;
+                    r_sck_en           = 1'b0;
+                end */
+        end
+
     always @ (posedge clk, negedge rst_n)
         begin
             if (~rst_n)
-                begin
-                    r_state <= INIT;
-                
-                    r_cs      <= 1'b1;
-                    r_mosi    <= 1'b0;
-                    r_rx_data <= 13'h0000;
-                    r_dv      <= 1'b0;
-                                
-                    r_tcsh_clk_cntr_en <= 1'b0;
-                    r_sck_en           <= 1'b0;
-                end
+                r_current_state <= INIT;
             else 
-                begin 
-                    case (r_state) 
-                        
-                        INIT :
-                            begin 
-                                r_cs      <= 1'b1;
-                                r_mosi    <= 1'b0;
-                                r_rx_data <= 13'h0000;
-                                r_dv      <= 1'b0;
-                                
-                                r_tcsh_clk_cntr_en <= 1'b1;
-                                r_sck_en           <= 1'b0;
-                                
-                              if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
-                                    r_state <= TX;
-                                else
-                                    r_state <= INIT;
-                            end
-                    
-                        TX : 
-                            begin 
-                                r_cs      <= 1'b0;
-                                r_mosi    <= r_tx_data[r_sck_cntr];
-                                r_rx_data <= 13'h0000;
-                                r_dv      <= 1'b0;
-                                
-                                r_tcsh_clk_cntr_en <= 1'b0;
-                                r_sck_en       <= 1'b1;
-
-                                if (r_sck_cntr == 3 && r_clk_cnts_per_sck == 899)
-                                    r_state <= RX;
-                                else
-                                    r_state <= TX;
-                            end 
-
-                        RX : 
-                            begin 
-                                r_cs   <= 1'b0;
-                                r_mosi <= 1'b0;
-                                if (r_clk_cnts_per_sck == 449)
-                                    r_rx_data[12-(r_sck_cntr-4)] <= miso; 
-                            
-                                r_dv   <= 1'b0;
-                                
-                                r_tcsh_clk_cntr_en <= 1'b0;
-                                r_sck_en       <= 1'b1;
-                                
-                                if (r_sck_cntr == 16 && r_clk_cnts_per_sck == 898)
-                                    r_state <= IDLE;
-                                else
-                                    r_state <= RX;  
-                            end
-
-                        IDLE : 
-                            begin
-                                r_cs      <= 1'b1;
-                                r_mosi    <= 1'b0;
-                                r_dv      <= 1'b1;
-                                
-                                r_tcsh_clk_cntr_en <= 1'b1;
-                                r_sck_en           <= 1'b0;
-                                
-                              if (r_tcsh_clk_cnts == TCSH_CLK_CNTS_MAX - 1)  // only move to next state if the total disable time is met
-                                    r_state <= TX;
-                            end
-
-                        default : r_state <= INIT;
-
-                    endcase
-                end 
-        end
+                r_current_state <= r_next_state;
+        end 
 
     assign cs = r_cs;
     assign mosi = r_mosi;
@@ -210,4 +243,3 @@ module MCP3202_SPI #(
     assign sck = (r_clk_cnts_per_sck <= 449 && r_sck_en) ? 0:1;
 
 endmodule
-
