@@ -57,9 +57,6 @@ module MCP3202_SPI #(
     // DATA TO BE TX'ed VIA MOSI LINE
     reg [3:0] r_tx_data = {MSBF, ODD[0], SGL[0], START};
     
-    // input registers
-    reg r_miso = 0;
-
     // output registers
     reg r_mosi = 0; 
     reg [12:0] r_rx_data = 13'h0000; // 1 null bit and 12 data bits
@@ -80,9 +77,12 @@ module MCP3202_SPI #(
     always @ (posedge clk or negedge rst_n)
         begin 
             if (~rst_n)
-                r_miso <= 0;
-            else 
-                r_miso <= miso;
+                r_rx_data <= 13'h0000;
+            else if (r_current_state == RX)
+                begin 
+                    if (r_clk_cnts_per_sck == 449)  // Register miso bits at middle of sck period (most stable)
+                        r_rx_data[12-(r_sck_cntr-4)] = miso;
+                end
         end 
     
     // TCSH counter
@@ -176,7 +176,6 @@ module MCP3202_SPI #(
                 begin 
                     r_cs      = 1'b1;
                     r_mosi    = 1'b0;
-                    r_rx_data = 13'h0000;
                     r_dv      = 1'b0;  // data is NOT valid in INIT state (no sample has occurred yet)
                     
                     r_tcsh_clk_cntr_en = 1'b1;  // count the time the ADC needs to be disabled to meet FSMPL
@@ -187,7 +186,6 @@ module MCP3202_SPI #(
                 begin 
                     r_cs      = 1'b0;  // enable ADC
                     r_mosi    = r_tx_data[r_sck_cntr];  // ship out mosi bits
-                    r_rx_data = 13'h0000;
                     r_dv      = 1'b0;
                     
                     r_tcsh_clk_cntr_en = 1'b0;
@@ -198,8 +196,6 @@ module MCP3202_SPI #(
                 begin            
                     r_cs   = 1'b0;
                     r_mosi = 1'b0;
-                    if (r_clk_cnts_per_sck == 449)  // Register miso bits at middle of sck period (most stable)
-                        r_rx_data[12-(r_sck_cntr-4)] = r_miso; 
                     r_dv   = 1'b0;
                     
                     r_tcsh_clk_cntr_en = 1'b0;
@@ -216,16 +212,15 @@ module MCP3202_SPI #(
                     r_sck_en           = 1'b0;
                 end
 
-            /* else
+            else
                 begin
                     r_cs      = 1'b1;
                     r_mosi    = 1'b0;
-                    r_rx_data = 13'h0000;
                     r_dv      = 1'b0;  
                                 
                     r_tcsh_clk_cntr_en = 1'b0;
                     r_sck_en           = 1'b0;
-                end */
+                end 
         end
 
     always @ (posedge clk, negedge rst_n)
