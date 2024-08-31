@@ -48,8 +48,7 @@ module MCP3202_SPI #(
     reg [1:0] r_state = INIT;
 
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
-    real real_tcsh_clk_cnts_max = (1/FSMPL) * FCLK - 15300; 
-    integer TCSH_CLK_CNTS_MAX = $rtoi(real_tcsh_clk_cnts_max);
+    localparam integer TCSH_CLK_CNTS_MAX = (FCLK/FSMPL) - 15300; 
 
     // additional MOSI data
     localparam START = 1'b1;           // start bit
