@@ -34,6 +34,9 @@ module tb_MCP3202_SPI_500sps;
   localparam ODD   = 0;     // Data Aquisition on Channel 0
   
   MCP3202_SPI #(FCLK,FSMPL,SGL,ODD) uut (clk, rst_n, miso, mosi, sck, cs, data, dv);
+
+  real half_clk_period = 1e9/(2*FCLK);
+  always #half_clk_period clk = ~clk;
   
   reg [11:0] r_tst_smpl = 12'h75f; // miso test sample word 
   
