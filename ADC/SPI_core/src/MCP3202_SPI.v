@@ -73,18 +73,6 @@ module MCP3202_SPI #(
     reg[4:0] r_sck_cntr = 0;
     reg r_sck_en = 0;
     
-    // register miso
-    always @ (posedge clk or negedge rst_n)
-        begin 
-            if (~rst_n)
-                r_rx_data <= 13'h0000;
-            else if (r_current_state == RX)
-                begin 
-                    if (r_clk_cnts_per_sck == 449)  // Register miso bits at middle of sck period (most stable)
-                        r_rx_data[12-(r_sck_cntr-4)] = miso;
-                end
-        end 
-    
     // TCSH counter
     always @ (posedge clk or negedge rst_n)
         begin
@@ -168,6 +156,18 @@ module MCP3202_SPI #(
                 default : r_next_state = INIT;
             endcase
         end
+
+    // register miso in RX state
+    always @ (posedge clk or negedge rst_n)
+        begin 
+            if (~rst_n)
+                r_rx_data <= 13'h0000;
+            else if (r_current_state == RX)
+                begin 
+                    if (r_clk_cnts_per_sck == 449)  // Register miso bits at middle of sck period (most stable)
+                        r_rx_data[12-(r_sck_cntr-4)] = miso;
+                end
+        end 
 
     // Output logic 
     always @ (*)
