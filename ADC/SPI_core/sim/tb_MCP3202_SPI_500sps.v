@@ -183,7 +183,7 @@ module tb_MCP3202_SPI_500sps;
       tx_sample();
       miso  = 1'bz;
 
-      r_tst_smpl = 12'h01A;
+      r_tst_smpl = 12'h7ff;
       TCSH_start = $time;
       tx_sample();
       miso  = 1'bz;
