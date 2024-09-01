@@ -1,4 +1,5 @@
-                      
+## pin outputs to connect to logic analyzer (ARTY S7-25 Board ONLY)
+                        
 ## CLK
 set_property -dict { PACKAGE_PIN R2    IOSTANDARD SSTL135 } [get_ports { clk }]; #IO_L12P_T1_MRCC_34 Sch=ddr3_clk[200]
 create_clock -add -name sys_clk_pin -period 10.000 -waveform {0 5.000}  [get_ports { clk }];
@@ -26,3 +27,4 @@ set_property -dict { PACKAGE_PIN P13   IOSTANDARD LVCMOS33 } [get_ports { data[1
 set_property -dict { PACKAGE_PIN U16   IOSTANDARD LVCMOS33 } [get_ports { data[11] }]; #IO_L16P_T2_CSI_B_14          Sch=jc7/ck_io[37]
 
 set_property -dict { PACKAGE_PIN U18   IOSTANDARD LVCMOS33 } [get_ports { dv }]; #IO_L15N_T2_DQS_DOUT_CSO_B_14 Sch=jc4/ck_io[38]
+
