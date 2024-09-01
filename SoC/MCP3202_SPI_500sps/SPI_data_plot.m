@@ -1,4 +1,5 @@
-% Settings for ILA are 4096 samples @ fs = 500 kHz
+%% Reads exported csv files (with samples) from Digilent Logic Analyzer 
+% Set Digilent Analog Discovery 2 Logic Analyzer to 4096 samples @ fs = 500 Hz (make sure not 512 Hz)
 
 clear all
 close all
@@ -64,9 +65,7 @@ title('ECG signal (After Jumping Jacks)');
 xlabel('Time (s)');
 ylabel('ECG Amplitude (V)');
 
-%%
-close all
-clc;
+
 
 % From electrode
 Vref = 3.12;
