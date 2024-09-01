@@ -5,12 +5,12 @@
 // 
 // Create Date: 07/13/2024 10:44:56 PM
 // Design Name: 
-// Module Name: tb_MCP3202_SPI_500sps
+// Module Name: tb_MCP3202_SPI_S_AXIS
 // Project Name: 
 // Target Devices: 7 Series
 // Tool Versions: 
 // Description: TB acts as MCP3202 ADC chip. Simulates timing, and sends out sample data. 
-//              Verifies "MCP3202_SPI_500sps.v"
+//              Verifies "MCP3202_SPI.v"
 //
 //              Datasheet: https://ww1.microchip.com/downloads/aemDocuments/documents/APID/ProductDocuments/DataSheets/21034F.pdf
 // 
@@ -195,6 +195,5 @@ module tb_MCP3202_SPI_500sps;
 
       #30000
       $finish(2);
-        end
-    //end
+    end
 endmodule
