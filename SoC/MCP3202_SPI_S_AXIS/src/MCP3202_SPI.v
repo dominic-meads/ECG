@@ -3,11 +3,11 @@
 // Company: 
 // Engineer: Dominic Meads
 // 
-// Create Date: 07/13/2024 10:37:57 PM
+// Create Date: 09/1/2024 10:37:57 PM
 // Design Name: 
 // Module Name: MCP3202_SPI
 // Project Name: 
-// Target Devices: 7 zeries
+// Target Devices: 7 series
 // Tool Versions: 
 // Description: An SPI master for an MCP3202 ADC. Compatible with AXI4 Stream. It has a configurable sample rate (set here to 
 //              500 samples/sec for an ECG demo. The ADC is set to operate in single-ended sampling
