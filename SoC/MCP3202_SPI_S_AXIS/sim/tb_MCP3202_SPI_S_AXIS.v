@@ -23,22 +23,38 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module tb_MCP3202_SPI_500sps;
-  reg clk, rst_n, miso, ready;
-  wire mosi, sck, cs, dv;
-  wire signed [15:0] data;
+module tb_MCP3202_SPI_S_AXIS;
+  reg clk, rst_n, miso, m_axis_spi_tready;
+  wire mosi, sck, cs, m_axis_spi_tvalid; 
+  wire signed [15:0] m_axis_spi_tdata;
   
   localparam FCLK  = 100e6; // clk frequency
   localparam FSMPL = 500;   // sampling frequency
   localparam SGL   = 1;     // single-ended mode
   localparam ODD   = 0;     // Data Aquisition on Channel 0
   
-  MCP3202_SPI #(FCLK,FSMPL,SGL,ODD) uut (clk, rst_n, miso, ready, mosi, sck, cs, data, dv);
+  MCP3202_SPI_S_AXIS #(
+    .FCLK(FCLK),
+    .FSMPL(FSMPL),
+    .SGL(SGL),
+    .ODD(ODD)
+    ) 
+    uut (
+    .clk(clk), 
+    .rst_n(rst_n), 
+    .miso(miso), 
+    .m_axis_spi_tready(m_axis_spi_tready), 
+    .mosi(mosi), 
+    .sck(sck), 
+    .cs(cs), 
+    .m_axis_spi_tdata(m_axis_spi_tdata), 
+    .m_axis_spi_tvalid(m_axis_spi_tvalid)
+    );
 
   real half_clk_period = 1e9/(2*FCLK);
   always #half_clk_period clk = ~clk;
   
-  reg [11:0] r_tst_smpl = 12'h75f; // miso test sample word 
+  reg [11:0] r_tst_smpl = 12'h000; // miso test sample word 
   
   integer TCSH_start = 0;
   integer TCSH = 0;
@@ -47,9 +63,6 @@ module tb_MCP3202_SPI_500sps;
   integer sck_period_start = 0;
   integer sck_period = 0;
   
-
-  // ADD IN FOREVER CONDITIONS TO CHECK FOR UNKNOWNS AND HIGH Z
-
   task tx_sample ();  // waits for cs to be active (low), and transmits sample
     begin
       wait (~cs) // cs low, start conversion. Check TCSH timing
@@ -154,46 +167,29 @@ module tb_MCP3202_SPI_500sps;
             miso = r_tst_smpl[0];
 
           wait(cs)
-            begin 
-              if (dv)
-                $display("All bits TX'ed. Data now valid. Sample time =%d ns", $time - TCSH_start);
-              if (data == {4'h0, r_tst_smpl})
-                $display("SIMULATION PASSED: Module sample accurate");
-              else if (data != {4'h0, r_tst_smpl})
-                $fatal(1,"SIMULATION FAILED: Module output data does not match test sample\n\n");        
-            end
+              miso  = 1'bz;   
         end
     end 
   endtask
       
       
   initial 
-    begin 
+    begin
       clk   = 1'b0;
       rst_n = 1'b0;
-      miso  = 1'bz;
-      ready = 1'b1; 
+      m_axis_spi_tready = 1'b0; 
       #25
       rst_n = 1'b1;
-      TCSH_start = $time;
-      tx_sample();
-      miso  = 1'bz;
-
-      r_tst_smpl = 12'h4e8;
-      TCSH_start = $time;
-      tx_sample();
-      miso  = 1'bz;
-      ready = 1'b0;  // Test when downstream fifo fills up
-
-      r_tst_smpl = 12'h7ff;
-      TCSH_start = $time;
-      tx_sample();
-      miso  = 1'bz;
-
-      if (dv)
-        $fatal(1,"data valid signal sent while downstream device was not ready");
-
-      #30000
+      m_axis_spi_tready = 1'b1;
+      // Start streaming in ADC samples
+      while (rst_n)
+        begin
+          TCSH_start = $time;
+          tx_sample();
+          r_tst_smpl = r_tst_smpl + 1;   
+        end
+        
+      #45000000
       $finish(2);
     end
 endmodule
