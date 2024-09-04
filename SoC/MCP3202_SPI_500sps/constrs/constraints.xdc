@@ -6,12 +6,12 @@ create_clock -add -name sys_clk_pin -period 10.000 -waveform {0 5.000}  [get_por
 
 ## INPUT
 set_property -dict { PACKAGE_PIN C18   IOSTANDARD LVCMOS33 } [get_ports { rst_n }]; #IO_L11N_T1_SRCC_15
-set_property -dict { PACKAGE_PIN T14   IOSTANDARD LVCMOS33 } [get_ports { miso }]; #IO_L13N_T2_MRCC_14 Sch=ck_io[4]
+set_property -dict { PACKAGE_PIN N18   IOSTANDARD LVCMOS33 } [get_ports { miso }]; #IO_L8N_T1_D12_14 Sch=ja_n[4]
 
-## OUTPUT
-set_property -dict { PACKAGE_PIN R16   IOSTANDARD LVCMOS33 } [get_ports { mosi }]; #IO_L14P_T2_SRCC_14 Sch=ck_io[5]
-set_property -dict { PACKAGE_PIN R17   IOSTANDARD LVCMOS33 } [get_ports { sck }]; #IO_L14N_T2_SRCC_14 Sch=ck_io[6]
-set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports { cs }]; #IO_L16N_T2_A15_D31_14 Sch=ck_io[7]
+set_property -dict { PACKAGE_PIN M16   IOSTANDARD LVCMOS33 } [get_ports { cs }]; #IO_L7P_T1_D09_14 Sch=ja_p[3]
+set_property -dict { PACKAGE_PIN M17   IOSTANDARD LVCMOS33 } [get_ports { sck }]; #IO_L7N_T1_D10_14 Sch=ja_n[3]
+set_property -dict { PACKAGE_PIN M18   IOSTANDARD LVCMOS33 } [get_ports { mosi }]; #IO_L8P_T1_D11_14 Sch=ja_p[4]
+
 
 set_property -dict { PACKAGE_PIN U11   IOSTANDARD LVCMOS33 } [get_ports { data[0] }]; #IO_L24P_T3_A01_D17_14        Sch=jd10/ck_io[26]
 set_property -dict { PACKAGE_PIN T11   IOSTANDARD LVCMOS33 } [get_ports { data[1] }]; #IO_L23N_T3_A02_D18_14        Sch=jd9/ck_io[27]
