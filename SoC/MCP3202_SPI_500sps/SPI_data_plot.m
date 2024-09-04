@@ -66,6 +66,19 @@ xlabel('Time (s)');
 ylabel('ECG Amplitude (V)');
 
 
+ECG_pcb_test_table = readtable('ECG_PCB_test.csv', 'VariableNamingRule', 'preserve');
+[a,b] = size(ECG_pcb_test_table);
+ecg_pcb = zeros(1,a);
+ecg_pcb = ECG_pcb_test_table.Data;
+
+v = 3.3*(ecg_pcb./4095);
+fs = 500;
+t = (0:length(v)-1)/(fs);
+figure('Color',[1,1,1]);
+plot(t,v);
+title('ECG signal (PCB Test)');
+xlabel('Time (s)');
+ylabel('ECG Amplitude (V)');
 
 % From electrode
 Vref = 3.12;
@@ -107,7 +120,7 @@ b = fir1(1000,Wc);
 freqz(b,1,2^10,fs);
 
 
-ecg_filt1 = filtfilt(b,1,ecg_noisy);
+ecg_filt1 = filtfilt(b,1,ecg_pcb);
 ecg_filt2 = smoothdata(ecg_filt1);
 ecg_filt_seg = Vref*(ecg_filt2(1250:2250)./4095); 
 ts = (0:length(ecg_filt_seg)-1)/(fs);
