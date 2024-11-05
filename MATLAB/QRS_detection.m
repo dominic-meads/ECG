@@ -143,7 +143,7 @@ b_ma = (1/n_ma)*ones(1,n_ma);
 
 %% Moving Average Filter Application
 
-ecg_ma = filtfilt(b_ma,1,ecg_sqr);
+ecg_ma = filtfilt(b_ma,1,ecg_sqr);  
 
 figure('Color',[1,1,1]);
 plot(t,ecg_test,"Color",[0.6 0.87 1]);
@@ -159,25 +159,70 @@ ylabel("Amplitude");
 xlabel("Time (s)");
 legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma), '-Point Moving Average')});
 
-%% QRS detection 
+%% 2nd Derivative design (Derivative, then smoothing)
 
-dif_int = diff(ecg_ma);  % get slope of MA-filtered ECG
+ecg_diff_2 = diff(ecg_ma);  % get slope of MA-filtered ECG
 
-% detect points inbetween min of derivative and max of derivative
-a = dif_int;
-L = length(dif_int);
-idmax = find((a(1:L-2)<a(2:L-1))&(a(2:L-1)>a(3:L)))+1;
-idmin = find((a(1:L-2)>a(2:L-1))&(a(2:L-1)<a(3:L)))+1;
+n_ma_2 = 40;
+b_ma_2 = (1/n_ma_2)*ones(1,n_ma_2);
+ecg_diff_2_smooth = filtfilt(b_ma_2,1,ecg_diff_2); 
 
-ppi = zeros(1,numel(idmax));
+%% 2nd Derivative Application
 
-for k = 1:numel(idmax)
-    i_start = idmax(k);
+figure('Color',[1,1,1]);
+plot(t,ecg_test,"Color",[0.6 0.87 1]);
+hold on;
+plot(t,ecg_bp,"Color",[1 0.3 0.3]);
+hold on;
+plot(t,[ecg_diff; 0],"Color",[0 0.6 0],"LineWidth",0.8);
+hold on;
+plot(t,0.125*[ecg_sqr; 0],"Color",[1 0.1 0.7]);
+hold on;
+plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1],"LineWidth",1.5);
+hold on;
+plot(t,[ecg_diff_2; 0; 0],"LineWidth",1.5);
+hold on;
+plot(t,[ecg_diff_2_smooth; 0; 0],"Color", [0.8 0 0],"LineWidth",1.5);
+ylabel("Amplitude");
+xlabel("Time (s)");
+legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma), '-Point Moving Average'), '2nd Derivative', 'Smoothed 2nd Derivative'});
 
-    if k < numel(idmin)  % if the interval end is greater than the length of signal, just use the end of signal
-        i_end = idmin(k+1);
+%% QRS Detection logic (Find Mx of 2nd Derivatve and Max of MA Filtered Signal)
+% Peaks can be seen in between the max of the 2nd derivative and the 
+% max of the moving-averaged signal. 
+
+% find maximums of 2nd derivative signal
+p = ecg_diff_2_smooth;  % rename for easier reading in the "find()" function
+L = length(ecg_diff_2);
+ecg_diff_2_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;  
+
+% find maximums of moving-averaged signal
+p = ecg_ma;
+L = length(ecg_ma);
+ecg_ma_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;
+
+figure('Color',[1,1,1]);
+plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1]);
+hold on;
+plot(ecg_ma_max/fs,ecg_ma(ecg_ma_max),'r*')
+hold on;
+plot(t,[ecg_diff_2_smooth; 0; 0]);
+hold on;
+plot(ecg_diff_2_max/fs,ecg_diff_2(ecg_diff_2_max),'b*');
+ylabel("Amplitude");
+xlabel("Time (s)");
+
+%% Intervals Inbetween each
+
+ppi = zeros(1,numel(ecg_ma_max));
+
+for k = 1:numel(ecg_ma_max)
+    i_start = ecg_diff_2_max(k);  % interval start
+
+    if k < numel(ecg_diff_2_max) 
+        i_end = ecg_ma_max(k);  % interval end
     else
-        i_end = numel(dif_int);
+        i_end = numel(ecg_diff_2);  % if the interval end is greater than the length of signal, just use the end of signal
     end
 
     x_intrvl = ecg_test(i_start:i_end);
@@ -188,7 +233,7 @@ end
 figure('Color',[1,1,1]);
 plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1]);
 hold on;
-plot(t,[dif_int; 0; 0]);
+plot(t,[ecg_diff_2; 0; 0]);
 ylabel("Amplitude");
 xlabel("Time (s)");
 
