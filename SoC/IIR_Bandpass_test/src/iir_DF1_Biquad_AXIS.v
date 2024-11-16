@@ -50,11 +50,11 @@ module iir_DF1_Biquad_AXIS #(
   parameter coeff_width  = 16,     // coefficient bit width
   parameter inout_width  = 16,     // input and output data wdth
   parameter scale_factor = 14,     // multiplying coefficients by 2^14
-  parameter a1_int_coeff = -31880,  // integer coefficients
-  parameter a2_int_coeff = 15531,
-  parameter b0_int_coeff = 167,
+  parameter b0_int_coeff = 167,    // integer coefficients
   parameter b1_int_coeff = -302,
   parameter b2_int_coeff = 167
+  parameter a1_int_coeff = -31880,  
+  parameter a2_int_coeff = 15531
 )(
   input  clk,
   input  rst_n,
@@ -69,12 +69,12 @@ module iir_DF1_Biquad_AXIS #(
   // filter coefficients (multiplied floating point coefficients by 2^14)
   // sos = {1.0000   -1.8057    1.0000    1.0000   -1.9459    0.9480}
   //         b0         b1        b2        a0        a1        a2
-  //   g = 0.0102 
-  reg signed [coeff_width-1:0] a1_fixed = a1_int_coeff;
-  reg signed [coeff_width-1:0] a2_fixed = a2_int_coeff;
+  //   g = 0.0102
   reg signed [coeff_width-1:0] b0_fixed = b0_int_coeff;   // g * b0 * 2^14  (multiply denom coeffs by gain for DF1 [source 1])
   reg signed [coeff_width-1:0] b1_fixed = b1_int_coeff;   // g * b1 * 2^14 
-  reg signed [coeff_width-1:0] b2_fixed = b2_int_coeff;   // g * b2 * 2^14
+  reg signed [coeff_width-1:0] b2_fixed = b2_int_coeff;   // g * b2 * 2^14 
+  reg signed [coeff_width-1:0] a1_fixed = a1_int_coeff;
+  reg signed [coeff_width-1:0] a2_fixed = a2_int_coeff;
 
   // input register
   reg signed [inout_width-1:0] r_x = 0;
@@ -91,11 +91,11 @@ module iir_DF1_Biquad_AXIS #(
   reg signed [inout_width-1:0] r_y_z2 = 0;
 
   // multiplication wires
-  wire signed [inout_width + coeff_width-1:0] w_product_a1;
-  wire signed [inout_width + coeff_width-1:0] w_product_a2;
   wire signed [inout_width + coeff_width-1:0] w_product_b0;
   wire signed [inout_width + coeff_width-1:0] w_product_b1;
   wire signed [inout_width + coeff_width-1:0] w_product_b2;
+  wire signed [inout_width + coeff_width-1:0] w_product_a1;
+  wire signed [inout_width + coeff_width-1:0] w_product_a2;
 
   // acummulate wire
   wire signed [inout_width + coeff_width-1:0] w_sum; 
@@ -204,11 +204,11 @@ module iir_DF1_Biquad_AXIS #(
     end
 
   // multiply
-  assign w_product_a1 = r_y_z1 * -a1_fixed;
-  assign w_product_a2 = r_y_z2 * -a2_fixed;
   assign w_product_b0 = r_x    * b0_fixed;
   assign w_product_b1 = r_x_z1 * b1_fixed;
   assign w_product_b2 = r_x_z2 * b2_fixed;
+  assign w_product_a1 = r_y_z1 * -a1_fixed;
+  assign w_product_a2 = r_y_z2 * -a2_fixed;
 
   // accumulate
   assign w_sum = w_product_b0 + w_product_b1 + w_product_b2 + w_product_a1 + w_product_a2;
