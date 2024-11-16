@@ -156,7 +156,7 @@ module ADC_behav #(
 
   initial 
     begin 
-      repeat(40)
+      repeat(70)
         begin 
           TCSH_start = $time;
           tx_sample();
