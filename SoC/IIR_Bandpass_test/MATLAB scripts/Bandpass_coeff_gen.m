@@ -55,3 +55,13 @@ figure;
 zplane(B_fixed,A_fixed);
 title('fixed-point zplane');
 
+%% print coefficients to file
+
+sos_table = table();
+sos_table.b0 = sos_fixed(:,1);
+sos_table.b1 = sos_fixed(:,2);
+sos_table.b2 = sos_fixed(:,3);
+sos_table.a1 = sos_fixed(:,5);  % omit a0 coefficient
+sos_table.a2 = sos_fixed(:,6);
+
+writetable(sos_table, "fixed_point_int_coeff_4th_order_bp.csv");

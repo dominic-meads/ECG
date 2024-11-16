@@ -1,0 +1,28 @@
+// sos0 coeffs
+parameter sos0_b0_int_ceoff = 111,
+parameter sos0_b1_int_ceoff = -223,
+parameter sos0_b2_int_ceoff = 111,
+parameter sos0_a1_int_ceoff = -15487989,
+parameter sos0_a2_int_ceoff = 7253728,
+
+// sos1 coeffs
+parameter sos1_b0_int_ceoff = 8388608,
+parameter sos1_b1_int_ceoff = 16777992,
+parameter sos1_b2_int_ceoff = 8389384,
+parameter sos1_a1_int_ceoff = -16019049,
+parameter sos1_a2_int_ceoff = 7687567,
+
+// sos2 coeffs
+parameter sos2_b0_int_ceoff = 8388608,
+parameter sos2_b1_int_ceoff = 16776439,
+parameter sos2_b2_int_ceoff = 8387831,
+parameter sos2_a1_int_ceoff = -15932677,
+parameter sos2_a2_int_ceoff = 7814858,
+
+// sos3 coeffs
+parameter sos3_b0_int_ceoff = 8388608,
+parameter sos3_b1_int_ceoff = -16777215,
+parameter sos3_b2_int_ceoff = 8388608,
+parameter sos3_a1_int_ceoff = -16534190,
+parameter sos3_a2_int_ceoff = 8180250,
+
