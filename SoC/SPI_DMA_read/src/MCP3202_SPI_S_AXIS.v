@@ -10,7 +10,7 @@
 // Target Devices: 7 series
 // Tool Versions: 
 // Description: An SPI master for an MCP3202 ADC. Compatible with AXI4 Stream. It has a configurable sample rate (set here to 
-//              500 samples/sec for an ECG demo. The ADC is set to operate in single-ended sampling
+//              200 samples/sec for an ECG demo. The ADC is set to operate in single-ended sampling
 //              "MSB first" mode on input channel 0. The ADC can be set to differential mode and 
 //              channel can be changed (see "parameters"), but "MSB first" mode is always selected
 //
@@ -25,8 +25,8 @@
 
 
 module MCP3202_SPI_S_AXIS #(
-    parameter FCLK  = 100e6, // clk frequency
-    parameter FSMPL = 500,   // sampling freqeuncy 
+    parameter FCLK  = 125e6, // clk frequency
+    parameter FSMPL = 5000,   // sampling freqeuncy 
     parameter SGL   = 1,     // sets ADC to single-ended
     parameter ODD   = 0      // sets ADC sample input to channel 0
     )(
@@ -41,12 +41,13 @@ module MCP3202_SPI_S_AXIS #(
     output s_axis_spi_tvalid
     );
 
-    localparam INIT = 2'b00;  // initialize the state machine
-    localparam TX   = 2'b01;  // set the sample channel, sampling mode, etc...
-    localparam RX   = 2'b10;  // convert the bitstream into parellel word
-    localparam IDLE = 2'b11;  // CS is high
+    localparam INIT = 3'b000;  // initialize the state machine
+    localparam TX   = 3'b001;  // set the sample channel, sampling mode, etc...
+    localparam RX   = 3'b010;  // convert the bitstream into parellel word
+    localparam DV   = 3'b011;  // Data valid
+    localparam IDLE = 3'b100;  // CS is high
 
-    reg [1:0] r_current_state, r_next_state;
+    reg [2:0] r_current_state, r_next_state;
 
     // Calculates number of input clk cycle counts equal to TCSH time (depends on clk)
     localparam integer TCSH_CLK_CNTS_MAX = (FCLK/FSMPL) - 15300; 
@@ -141,9 +142,17 @@ module MCP3202_SPI_S_AXIS #(
                 RX : 
                     begin 
                         if (r_sck_cntr == 16 && r_clk_cnts_per_sck == 898)
-                            r_next_state = IDLE;
+                            r_next_state = DV;
                         else
                             r_next_state = r_current_state;  
+                    end
+
+                DV :
+                    begin
+                        if (r_sck_cntr == 16 && r_clk_cnts_per_sck == 899)  // only in DV state for 1 clk cycle
+                            r_next_state = IDLE;
+                        else
+                            r_next_state = r_current_state;
                     end
 
                 IDLE : 
@@ -203,11 +212,21 @@ module MCP3202_SPI_S_AXIS #(
                     r_sck_en           = 1'b1;
                 end
 
+            else if (r_current_state == DV)
+                begin            
+                    r_cs   = 1'b0;
+                    r_mosi = 1'b0;
+                    r_dv   = 1'b1;  // sample data is now valid
+                    
+                    r_tcsh_clk_cntr_en = 1'b0;
+                    r_sck_en           = 1'b1;
+                end
+
             else if (r_current_state == IDLE)
                 begin
                     r_cs      = 1'b1;  // disable ADC
                     r_mosi    = 1'b0;
-                    r_dv      = 1'b1;  // sample data is now valid
+                    r_dv      = 1'b0;  
                     
                     r_tcsh_clk_cntr_en = 1'b1;  // start counting ADC disable time again
                     r_sck_en           = 1'b0;
@@ -239,3 +258,4 @@ module MCP3202_SPI_S_AXIS #(
     assign sck = (r_clk_cnts_per_sck <= 449 && r_sck_en) ? 0:1;
 
 endmodule
+
