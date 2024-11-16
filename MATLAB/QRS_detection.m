@@ -163,6 +163,8 @@ legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma),
 
 ecg_diff_2 = diff(ecg_ma);  % get slope of MA-filtered ECG
 
+ecg_diff_2 = ecg_diff_2.*2; % try increasing amplitude? 
+
 n_ma_2 = 40;
 b_ma_2 = (1/n_ma_2)*ones(1,n_ma_2);
 ecg_diff_2_smooth = filtfilt(b_ma_2,1,ecg_diff_2); 
@@ -186,6 +188,18 @@ plot(t,[ecg_diff_2_smooth; 0; 0],"Color", [0.8 0 0],"LineWidth",1.5);
 ylabel("Amplitude");
 xlabel("Time (s)");
 legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma), '-Point Moving Average'), '2nd Derivative', 'Smoothed 2nd Derivative'});
+
+%% Plot Raw, 2nd Derivative (Smoothed), and MA-filtered Signals
+
+figure('Color',[1,1,1]);
+plot(t,ecg_test,"Color",[0.45 0.70 1]);
+hold on;
+plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1],"LineWidth",1.5);
+hold on;
+plot(t,[ecg_diff_2_smooth; 0; 0],"Color", [0.8 0 0],"LineWidth",1.5);
+ylabel("Amplitude");
+xlabel("Time (s)");
+legend({'ECG Raw', strcat(num2str(n_ma), '-Point Moving Average'), 'Smoothed 2nd Derivative'});
 
 %% QRS Detection logic (Find Mx of 2nd Derivatve and Max of MA Filtered Signal)
 % Peaks can be seen in between the max of the 2nd derivative and the 
@@ -240,7 +254,11 @@ xlabel("Time (s)");
 figure('Color',[1,1,1]);
 plot(t,ecg_test);
 hold on; 
-h = plot(ppi/fs,ecg_test(ppi),'r*');
-set(h,'MarkerSize',5); 
+h = plot(ppi/fs,ecg_test(ppi),'s');
+set(h,'MarkerSize',7);
+set(h,'MarkerEdgeColor',[0.5,0.5,0.5]);
+set(h,'MarkerFaceColor','r');
 
+
+%% Display 
 
