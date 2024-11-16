@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_MCP3202_SPI_500sps_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_MCP3202_SPI_500sps" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="6703294fs"></ZoomEndTime>
+      <Cursor1Time time="1000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="308"></NameColumnWidth>
+      <ValueColumnWidth column_width="143"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="20" />
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/sck" type="logic">
+      <obj_property name="ElementShortName">sck</obj_property>
+      <obj_property name="ObjectShortName">sck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/dv" type="logic">
+      <obj_property name="ElementShortName">dv</obj_property>
+      <obj_property name="ObjectShortName">dv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/data" type="array">
+      <obj_property name="ElementShortName">data[11:0]</obj_property>
+      <obj_property name="ObjectShortName">data[11:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/half_clk_period" type="other">
+      <obj_property name="ElementShortName">half_clk_period</obj_property>
+      <obj_property name="ObjectShortName">half_clk_period</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/r_tst_smpl" type="array">
+      <obj_property name="ElementShortName">r_tst_smpl[11:0]</obj_property>
+      <obj_property name="ObjectShortName">r_tst_smpl[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/TCSH_start" type="array">
+      <obj_property name="ElementShortName">TCSH_start[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TCSH_start[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/TCSH" type="array">
+      <obj_property name="ElementShortName">TCSH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TCSH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/TSUCS_start" type="array">
+      <obj_property name="ElementShortName">TSUCS_start[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TSUCS_start[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/TSUCS" type="array">
+      <obj_property name="ElementShortName">TSUCS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TSUCS[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/sck_period_start" type="array">
+      <obj_property name="ElementShortName">sck_period_start[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sck_period_start[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/sck_period" type="array">
+      <obj_property name="ElementShortName">sck_period[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sck_period[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/FCLK" type="other">
+      <obj_property name="ElementShortName">FCLK</obj_property>
+      <obj_property name="ObjectShortName">FCLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/FSMPL" type="array">
+      <obj_property name="ElementShortName">FSMPL[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FSMPL[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/SGL" type="array">
+      <obj_property name="ElementShortName">SGL[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SGL[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_MCP3202_SPI_500sps/ODD" type="array">
+      <obj_property name="ElementShortName">ODD[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ODD[31:0]</obj_property>
+   </wvobject>
+</wave_config>
