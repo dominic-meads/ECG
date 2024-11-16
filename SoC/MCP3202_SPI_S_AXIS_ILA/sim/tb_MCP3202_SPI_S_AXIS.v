@@ -24,9 +24,9 @@
 
 
 module tb_MCP3202_SPI_S_AXIS;
-  reg clk, rst_n, s_axis_spi_tready;
-  wire s_axis_spi_tvalid; 
-  wire signed [15:0] s_axis_spi_tdata;
+  reg clk, rst_n, m_axis_tready;
+  wire m_axis_tvalid, m_axis_tlast;
+  wire [15:0] m_axis_tdata;
   
   localparam FCLK  = 100e6; // clk frequency
   localparam FSMPL = 500;   // sampling frequency
@@ -36,22 +36,23 @@ module tb_MCP3202_SPI_S_AXIS;
   // intermediate signals
   wire w_cs, w_sck, w_mosi, w_miso;
   
-  MCP3202_SPI_S_AXIS #(
+  AXI_stream_SPI #(
     .FCLK(FCLK),
     .FSMPL(FSMPL),
     .SGL(SGL),
     .ODD(ODD)
     ) 
     uut (
-    .clk(clk), 
-    .rst_n(rst_n), 
-    .miso(w_miso), 
-    .s_axis_spi_tready(s_axis_spi_tready), 
-    .mosi(w_mosi), 
-    .sck(w_sck), 
-    .cs(w_cs), 
-    .s_axis_spi_tdata(s_axis_spi_tdata), 
-    .s_axis_spi_tvalid(s_axis_spi_tvalid)
+    .clk(clk),
+    .rst_n(rst_n),
+    .miso(w_miso),
+    .m_axis_tready(m_axis_tready),
+    .mosi(w_mosi),
+    .sck(w_sck),
+    .cs(w_cs),
+    .m_axis_tvalid(m_axis_tvalid),
+    .m_axis_tdata(m_axis_tdata),
+    .m_axis_tlast(m_axis_tlast) 
     );
 
   ADC_behav #(
@@ -69,20 +70,23 @@ module tb_MCP3202_SPI_S_AXIS;
 
   real half_clk_period = 1e9/(2*FCLK);
   always #half_clk_period clk = ~clk;
+  
+  integer i_SBST_CNV_SMPLS = 64;
+  integer i_PKT_TIME_ns; // time required for subset converter to hold one packet of ADC samples
       
   initial 
     begin
+      i_PKT_TIME_ns = (1/FSMPL)*i_SBST_CNV_SMPLS; 
       clk   = 1'b0;
       rst_n = 1'b0;
-      s_axis_spi_tready = 1'b0; 
+      m_axis_tready = 1'b0; 
       #25
       rst_n = 1'b1;
-      s_axis_spi_tready = 1'b1;  
-      #45000000
-      s_axis_spi_tready = 1'b0;
-      #20000000
-      s_axis_spi_tready = 1'b1;
-      #20000000
+      m_axis_tready = 1'b1;  
+      //#i_PKT_TIME_ns
+      #128000000
+      #50000000
+      m_axis_tready = 1'b0;
       $finish(2);
     end
 endmodule

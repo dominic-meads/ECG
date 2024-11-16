@@ -25,7 +25,7 @@
 
 
 module MCP3202_SPI_S_AXIS #(
-    parameter FCLK  = 100e6, // clk frequency
+    parameter FCLK  = 125e6, // clk frequency
     parameter FSMPL = 500,   // sampling freqeuncy 
     parameter SGL   = 1,     // sets ADC to single-ended
     parameter ODD   = 0      // sets ADC sample input to channel 0
