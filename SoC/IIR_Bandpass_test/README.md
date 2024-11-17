@@ -2,7 +2,7 @@ Test of IIR bandpass filter in verilog.
 
 Filter is prototyped in MATLAB, then the coefficients are scaled and converted to fixed-point integers. 
 
-The Python program takes the sos output matrix of the MATLAB code and turns it into parameters for four instances
+The Python program takes the sos output matrix of the MATLAB code and turns it into verilog parameter statements for four instances
 of second order IIR filter. 
 
 The four sos sections are implemented on the FPGA in Direct-form 1 configuration, and are cascaded together. 
