@@ -10,10 +10,82 @@ module Bandpass_impulse_response_tb;
   wire m_axis_tvalid;
   wire s_axis_tready;
 
-  always #10 clk = ~clk;
+  always #10 clk = ~clk; 
 
-  // intermediate signals
-  wire signed [15:0] 
+  iir_DF1_Biquad_AXIS #(
+    .coeff_width(25),
+    .inout_width(16),
+    .scale_factor(23),
+
+    .sos0_b0_int_coeff(111),
+    .sos0_b1_int_coeff(-223),
+    .sos0_b2_int_coeff(111),
+    .sos0_a1_int_coeff(-15487989),
+    .sos0_a2_int_coeff(7253728),
+
+    .sos1_b0_int_coeff(8388608),
+    .sos1_b1_int_coeff(16777992),
+    .sos1_b2_int_coeff(8389384),
+    .sos1_a1_int_coeff(-16019049),
+    .sos1_a2_int_coeff(7687567),
+
+    .sos2_b0_int_coeff(8388608),
+    .sos2_b1_int_coeff(16776439),
+    .sos2_b2_int_coeff(8387831),
+    .sos2_a1_int_coeff(-15932677),
+    .sos2_a2_int_coeff(7814858),
+
+    .sos3_b0_int_coeff(8388608),
+    .sos3_b1_int_coeff(-16777215),
+    .sos3_b2_int_coeff(8388608),
+    .sos3_a1_int_coeff(-16534190),
+    .sos3_a2_int_coeff(8180250)
+  ) uut (
+    .clk(clk),
+    .rst_n(rst_n),
+    .s_axis_tvalid(s_axis_tvalid),
+    .s_axis_tdata(s_axis_tdata),
+    .m_axis_tready(m_axis_tready),
+    .m_axis_tdata(m_axis_tdata),
+    .m_axis_tvalid(m_axis_tvalid),
+    .s_axis_tready(s_axis_tready)
+  );
+
+  initial 
+    begin
+    clk = 1'b0;
+    rst_n = 1'b0; 
+    s_axis_tdata = 0;
+    s_axis_tvalid = 1'b0; 
+    m_axis_tready = 1'b0;
+    #40
+    rst_n = 1'b1;  // release reset
+    #20
+    m_axis_tready = 1'b1;  // upstream device becomes ready
+    #20
+    r_s_axis_tdata = 16'h7FFF;  // positive impulse
+    #20
+    s_axis_tvalid = 1'b1;
+    #20
+    s_axis_tvalid = 1'b0;
+    #50000
+    $finish;
+    end
+
+endmodule
+
+/*
+module Bandpass_impulse_response_tb;
+  reg  clk;
+  reg  rst_n;
+  reg  s_axis_tvalid;
+  reg  m_axis_tready; 
+  reg  signed [15:0] s_axis_tdata;
+  wire signed [15:0] m_axis_tdata;
+  wire m_axis_tvalid;
+  wire s_axis_tready;
+
+  always #10 clk = ~clk; 
 
   integer fid;
   integer status;
@@ -26,15 +98,34 @@ module Bandpass_impulse_response_tb;
   reg signed [15:0] r_wave_sample [num_samples - 1:0];
 
   iir_DF1_Biquad_AXIS #(
-    .coeff_width(16),
+    .coeff_width(25),
     .inout_width(16),
-    .scale_factor(14),
-    .a1_int_coeff(-31880),
-    .a2_int_coeff(15531),
-    .bo_int_coeff(167),
-    .b1_int_coeff(-302),
-    .b2_int_coeff(167)
-  ) sos0 (
+    .scale_factor(23),
+
+    .sos0_b0_int_coeff(111),
+    .sos0_b1_int_coeff(-223),
+    .sos0_b2_int_coeff(111),
+    .sos0_a1_int_coeff(-15487989),
+    .sos0_a2_int_coeff(7253728),
+
+    .sos1_b0_int_coeff(8388608),
+    .sos1_b1_int_coeff(16777992),
+    .sos1_b2_int_coeff(8389384),
+    .sos1_a1_int_coeff(-16019049),
+    .sos1_a2_int_coeff(7687567),
+
+    .sos2_b0_int_coeff(8388608),
+    .sos2_b1_int_coeff(16776439),
+    .sos2_b2_int_coeff(8387831),
+    .sos2_a1_int_coeff(-15932677),
+    .sos2_a2_int_coeff(7814858),
+
+    .sos3_b0_int_coeff(8388608),
+    .sos3_b1_int_coeff(-16777215),
+    .sos3_b2_int_coeff(8388608),
+    .sos3_a1_int_coeff(-16534190),
+    .sos3_a2_int_coeff(8180250)
+  ) uut (
     .clk(clk),
     .rst_n(rst_n),
     .s_axis_tvalid(s_axis_tvalid),
@@ -82,3 +173,4 @@ module Bandpass_impulse_response_tb;
     end
 
 endmodule
+*/

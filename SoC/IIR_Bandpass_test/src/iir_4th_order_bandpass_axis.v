@@ -36,32 +36,32 @@ module iir_4th_order_bandpass_axis #(
   parameter scale_factor = 23,     // multiplying coefficients by 2^23
   
   // sos0 coefficients (gain embedded in this section)
-  parameter sos0_b0_int_ceoff = 111,
-  parameter sos0_b1_int_ceoff = -223,
-  parameter sos0_b2_int_ceoff = 111,
-  parameter sos0_a1_int_ceoff = -15487989,
-  parameter sos0_a2_int_ceoff = 7253728,
+  parameter sos0_b0_int_coeff = 111,
+  parameter sos0_b1_int_coeff = -223,
+  parameter sos0_b2_int_coeff = 111,
+  parameter sos0_a1_int_coeff = -15487989,
+  parameter sos0_a2_int_coeff = 7253728,
 
   // sos1 coeffs
-  parameter sos1_b0_int_ceoff = 8388608,
-  parameter sos1_b1_int_ceoff = 16777992,
-  parameter sos1_b2_int_ceoff = 8389384,
-  parameter sos1_a1_int_ceoff = -16019049,
-  parameter sos1_a2_int_ceoff = 7687567,
+  parameter sos1_b0_int_coeff = 8388608,
+  parameter sos1_b1_int_coeff = 16777992,
+  parameter sos1_b2_int_coeff = 8389384,
+  parameter sos1_a1_int_coeff = -16019049,
+  parameter sos1_a2_int_coeff = 7687567,
 
   // sos2 coeffs
-  parameter sos2_b0_int_ceoff = 8388608,
-  parameter sos2_b1_int_ceoff = 16776439,
-  parameter sos2_b2_int_ceoff = 8387831,
-  parameter sos2_a1_int_ceoff = -15932677,
-  parameter sos2_a2_int_ceoff = 7814858,
+  parameter sos2_b0_int_coeff = 8388608,
+  parameter sos2_b1_int_coeff = 16776439,
+  parameter sos2_b2_int_coeff = 8387831,
+  parameter sos2_a1_int_coeff = -15932677,
+  parameter sos2_a2_int_coeff = 7814858,
 
   // sos3 coeffs
-  parameter sos3_b0_int_ceoff = 8388608,
-  parameter sos3_b1_int_ceoff = -16777215,
-  parameter sos3_b2_int_ceoff = 8388608,
-  parameter sos3_a1_int_ceoff = -16534190,
-  parameter sos3_a2_int_ceoff = 8180250
+  parameter sos3_b0_int_coeff = 8388608,
+  parameter sos3_b1_int_coeff = -16777215,
+  parameter sos3_b2_int_coeff = 8388608,
+  parameter sos3_a1_int_coeff = -16534190,
+  parameter sos3_a2_int_coeff = 8180250
 )(
   input  clk,
   input  rst_n,
@@ -72,3 +72,100 @@ module iir_4th_order_bandpass_axis #(
   output m_axis_tvalid,
   output s_axis_tready
 );
+
+
+  // internal signals between sections
+  wire signed [inout_width-1:0] sos0_to_sos1_tdata;
+  wire sos0_to_sos1_tvalid;
+  wire sos1_to_sos0_tready;
+
+  wire signed [inout_width-1:0] sos1_to_sos2_tdata;
+  wire sos1_to_sos2_tvalid;
+  wire sos2_to_sos1_tready; 
+
+  wire signed [inout_width-1:0] sos2_to_sos3_tdata;
+  wire sos2_to_sos3_tvalid;
+  wire sos3_to_sos2_tready; 
+
+  //sos DF1 instantiations
+  iir_DF1_Biquad_AXIS #(
+    .coeff_width(coeff_width),
+    .inout_width(inout_width),
+    .scale_factor(scale_factor),
+    .bo_int_coeff(sos0_b0_int_coeff),
+    .b1_int_coeff(sos0_b1_int_coeff),
+    .b2_int_coeff(sos0_b2_int_coeff),
+    .a1_int_coeff(sos0_a1_int_coeff),
+    .a2_int_coeff(sos0_a2_int_coeff)
+  ) sos0 (
+    .clk(clk),
+    .rst_n(rst_n),
+    .s_axis_tvalid(s_axis_tvalid),
+    .s_axis_tdata(s_axis_tdata),
+    .m_axis_tready(sos1_to_sos0_tready),
+    .m_axis_tdata(sos0_to_sos1_tdata),
+    .m_axis_tvalid(sos0_to_sos1_tvalid),
+    .s_axis_tready(s_axis_tready)
+  );
+
+  iir_DF1_Biquad_AXIS #(
+    .coeff_width(coeff_width),
+    .inout_width(inout_width),
+    .scale_factor(scale_factor),
+    .bo_int_coeff(sos1_b0_int_coeff),
+    .b1_int_coeff(sos1_b1_int_coeff),
+    .b2_int_coeff(sos1_b2_int_coeff),
+    .a1_int_coeff(sos1_a1_int_coeff),
+    .a2_int_coeff(sos1_a2_int_coeff)
+  ) sos1 (
+    .clk(clk),
+    .rst_n(rst_n),
+    .s_axis_tvalid(sos0_to_sos1_tvalid),
+    .s_axis_tdata(sos0_to_sos1_tdata),
+    .m_axis_tready(sos2_to_sos1_tready),
+    .m_axis_tdata(sos1_to_sos2_tdata),
+    .m_axis_tvalid(sos1_to_sos2_tvalid),
+    .s_axis_tready(sos1_to_sos0_tready)
+  );
+
+    iir_DF1_Biquad_AXIS #(
+    .coeff_width(coeff_width),
+    .inout_width(inout_width),
+    .scale_factor(scale_factor),
+    .bo_int_coeff(sos2_b0_int_coeff),
+    .b1_int_coeff(sos2_b1_int_coeff),
+    .b2_int_coeff(sos2_b2_int_coeff),
+    .a1_int_coeff(sos2_a1_int_coeff),
+    .a2_int_coeff(sos2_a2_int_coeff)
+  ) sos2 (
+    .clk(clk),
+    .rst_n(rst_n),
+    .s_axis_tvalid(sos1_to_sos2_tvalid),
+    .s_axis_tdata(sos1_to_sos2_tdata),
+    .m_axis_tready(sos3_to_sos2_tready),
+    .m_axis_tdata(sos2_to_sos3_tdata),
+    .m_axis_tvalid(sos2_to_sos3_tvalid),
+    .s_axis_tready(sos2_to_sos1_tready)
+  );
+
+  iir_DF1_Biquad_AXIS #(
+    .coeff_width(coeff_width),
+    .inout_width(inout_width),
+    .scale_factor(scale_factor),
+    .bo_int_coeff(sos3_b0_int_coeff),
+    .b1_int_coeff(sos3_b1_int_coeff),
+    .b2_int_coeff(sos3_b2_int_coeff),
+    .a1_int_coeff(sos3_a1_int_coeff),
+    .a2_int_coeff(sos3_a2_int_coeff)
+  ) sos3 (
+    .clk(clk),
+    .rst_n(rst_n),
+    .s_axis_tvalid(sos2_to_sos3_tvalid),
+    .s_axis_tdata(sos2_to_sos3_tdata),
+    .m_axis_tready(m_axis_tready),
+    .m_axis_tdata(m_axis_tdata),
+    .m_axis_tvalid(m_axis_tvalid),
+    .s_axis_tready(sos3_to_sos2_tready)
+  );
+
+endmodule
