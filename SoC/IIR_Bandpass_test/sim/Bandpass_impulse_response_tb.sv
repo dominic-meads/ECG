@@ -12,7 +12,7 @@ module Bandpass_impulse_response_tb;
 
   always #10 clk = ~clk; 
 
-  iir_DF1_Biquad_AXIS #(
+  iir_4th_order_bandpass_axis #(
     .coeff_width(25),
     .inout_width(16),
     .scale_factor(23),
@@ -63,12 +63,21 @@ module Bandpass_impulse_response_tb;
     #20
     m_axis_tready = 1'b1;  // upstream device becomes ready
     #20
-    r_s_axis_tdata = 16'h7FFF;  // positive impulse
+    s_axis_tdata = 16'h7FFF;  // positive impulse
     #20
     s_axis_tvalid = 1'b1;
     #20
     s_axis_tvalid = 1'b0;
-    #50000
+    #20
+    s_axis_tdata = 16'h0000;
+    repeat(500)
+      begin  
+        #20
+        s_axis_tvalid = 1'b1;
+        #20
+        s_axis_tvalid = 1'b0;
+      end 
+    #20000
     $finish;
     end
 

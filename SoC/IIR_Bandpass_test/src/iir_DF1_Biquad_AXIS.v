@@ -52,7 +52,7 @@ module iir_DF1_Biquad_AXIS #(
   parameter scale_factor = 14,     // multiplying coefficients by 2^14
   parameter b0_int_coeff = 167,    // integer coefficients
   parameter b1_int_coeff = -302,
-  parameter b2_int_coeff = 167
+  parameter b2_int_coeff = 167,
   parameter a1_int_coeff = -31880,  
   parameter a2_int_coeff = 15531
 )(
