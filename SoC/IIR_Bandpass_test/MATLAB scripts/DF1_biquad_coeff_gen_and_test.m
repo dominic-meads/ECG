@@ -126,7 +126,7 @@ f = linspace(0,fs/2,size(hn_f,1)/2);
 H_f = abs(fft(hn_f)); % magnitude of fft
 H_f = H_f(1:end/2);   % plot single-sided spectrum
 H_f_db = mag2db(H_f);
-H_f_db = H_f_db - max(H_f_db); % normalize to maximum? not sure if this is okay to do
+H_f_db = H_f_db - max(H_f_db); % normalize to maximum
 figure('Color',[1 1 1]);
 subplot(2,1,1);
 plot(f,H_f_db);
