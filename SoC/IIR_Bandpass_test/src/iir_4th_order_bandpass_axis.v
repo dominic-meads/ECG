@@ -43,23 +43,23 @@ module iir_4th_order_bandpass_axis #(
   parameter sos0_a2_int_coeff = 7253728,
 
   // sos1 coeffs
-  parameter sos1_b0_int_coeff = 8388608,
-  parameter sos1_b1_int_coeff = 16777992,
-  parameter sos1_b2_int_coeff = 8389384,
+  parameter sos1_b0_int_coeff = 111,
+  parameter sos1_b1_int_coeff = 223,
+  parameter sos1_b2_int_coeff = 111,
   parameter sos1_a1_int_coeff = -16019049,
   parameter sos1_a2_int_coeff = 7687567,
 
   // sos2 coeffs
-  parameter sos2_b0_int_coeff = 8388608,
-  parameter sos2_b1_int_coeff = 16776439,
-  parameter sos2_b2_int_coeff = 8387831,
+  parameter sos2_b0_int_coeff = 111,
+  parameter sos2_b1_int_coeff = 223,
+  parameter sos2_b2_int_coeff = 111,
   parameter sos2_a1_int_coeff = -15932677,
   parameter sos2_a2_int_coeff = 7814858,
 
   // sos3 coeffs
-  parameter sos3_b0_int_coeff = 8388608,
-  parameter sos3_b1_int_coeff = -16777215,
-  parameter sos3_b2_int_coeff = 8388608,
+  parameter sos3_b0_int_coeff = 111,
+  parameter sos3_b1_int_coeff = -223,
+  parameter sos3_b2_int_coeff = 111,
   parameter sos3_a1_int_coeff = -16534190,
   parameter sos3_a2_int_coeff = 8180250
 )(
