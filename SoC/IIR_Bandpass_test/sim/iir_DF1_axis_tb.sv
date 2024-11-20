@@ -92,7 +92,7 @@ module iir_DF1_axi_s_tb;
           s_axis_tvalid = 1'b0;
         end
       
-      checking_impulse_resp = 1'b1;
+      checking_impulse_resp = 1'b0;
     end
   endtask
 
