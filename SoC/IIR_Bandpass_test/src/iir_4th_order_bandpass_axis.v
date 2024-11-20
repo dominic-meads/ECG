@@ -35,33 +35,33 @@ module iir_4th_order_bandpass_axis #(
   parameter inout_width  = 16,     // input and output data wdth
   parameter scale_factor = 23,     // multiplying coefficients by 2^23
   
-  // sos0 coefficients (gain embedded in this section)
+  // sos0 coeffs
   parameter sos0_b0_int_coeff = 111,
-  parameter sos0_b1_int_coeff = -223,
+  parameter sos0_b1_int_coeff = 223,
   parameter sos0_b2_int_coeff = 111,
-  parameter sos0_a1_int_coeff = -15487989,
-  parameter sos0_a2_int_coeff = 7253728,
+  parameter sos0_a1_int_coeff = -16019049,
+  parameter sos0_a2_int_coeff = 7687567,
 
   // sos1 coeffs
-  parameter sos1_b0_int_coeff = 111,
-  parameter sos1_b1_int_coeff = 223,
-  parameter sos1_b2_int_coeff = 111,
-  parameter sos1_a1_int_coeff = -16019049,
-  parameter sos1_a2_int_coeff = 7687567,
+  parameter sos1_b0_int_coeff = 8388608,
+  parameter sos1_b1_int_coeff = 16776439,
+  parameter sos1_b2_int_coeff = 8387831,
+  parameter sos1_a1_int_coeff = -15932677,
+  parameter sos1_a2_int_coeff = 7814858,
 
   // sos2 coeffs
-  parameter sos2_b0_int_coeff = 111,
-  parameter sos2_b1_int_coeff = 223,
-  parameter sos2_b2_int_coeff = 111,
-  parameter sos2_a1_int_coeff = -15932677,
-  parameter sos2_a2_int_coeff = 7814858,
+  parameter sos2_b0_int_coeff = 8388608,
+  parameter sos2_b1_int_coeff = -16777215,
+  parameter sos2_b2_int_coeff = 8388608,
+  parameter sos2_a1_int_coeff = -16534190,
+  parameter sos2_a2_int_coeff = 8180250,
 
   // sos3 coeffs
-  parameter sos3_b0_int_coeff = 111,
-  parameter sos3_b1_int_coeff = -223,
-  parameter sos3_b2_int_coeff = 111,
-  parameter sos3_a1_int_coeff = -16534190,
-  parameter sos3_a2_int_coeff = 8180250
+  parameter sos3_b0_int_coeff = 8388608,
+  parameter sos3_b1_int_coeff = -16777216,
+  parameter sos3_b2_int_coeff = 8388607,
+  parameter sos3_a1_int_coeff = -15487989,
+  parameter sos3_a2_int_coeff = 7253728
 )(
   input  clk,
   input  rst_n,
@@ -92,7 +92,7 @@ module iir_4th_order_bandpass_axis #(
     .coeff_width(coeff_width),
     .inout_width(inout_width),
     .scale_factor(scale_factor),
-    .bo_int_coeff(sos0_b0_int_coeff),
+    .b0_int_coeff(sos0_b0_int_coeff),
     .b1_int_coeff(sos0_b1_int_coeff),
     .b2_int_coeff(sos0_b2_int_coeff),
     .a1_int_coeff(sos0_a1_int_coeff),
@@ -112,7 +112,7 @@ module iir_4th_order_bandpass_axis #(
     .coeff_width(coeff_width),
     .inout_width(inout_width),
     .scale_factor(scale_factor),
-    .bo_int_coeff(sos1_b0_int_coeff),
+    .b0_int_coeff(sos1_b0_int_coeff),
     .b1_int_coeff(sos1_b1_int_coeff),
     .b2_int_coeff(sos1_b2_int_coeff),
     .a1_int_coeff(sos1_a1_int_coeff),
@@ -132,7 +132,7 @@ module iir_4th_order_bandpass_axis #(
     .coeff_width(coeff_width),
     .inout_width(inout_width),
     .scale_factor(scale_factor),
-    .bo_int_coeff(sos2_b0_int_coeff),
+    .b0_int_coeff(sos2_b0_int_coeff),
     .b1_int_coeff(sos2_b1_int_coeff),
     .b2_int_coeff(sos2_b2_int_coeff),
     .a1_int_coeff(sos2_a1_int_coeff),
@@ -152,7 +152,7 @@ module iir_4th_order_bandpass_axis #(
     .coeff_width(coeff_width),
     .inout_width(inout_width),
     .scale_factor(scale_factor),
-    .bo_int_coeff(sos3_b0_int_coeff),
+    .b0_int_coeff(sos3_b0_int_coeff),
     .b1_int_coeff(sos3_b1_int_coeff),
     .b2_int_coeff(sos3_b2_int_coeff),
     .a1_int_coeff(sos3_a1_int_coeff),
