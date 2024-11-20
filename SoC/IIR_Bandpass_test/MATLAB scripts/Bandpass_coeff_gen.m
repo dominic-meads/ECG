@@ -25,18 +25,71 @@ freqz(B,A,2^10,fs);
 title("Floating Point Coefficients Frequency Response");
 
 %% Generate fixed-point integer coefficients for FPGA
+% 
+% % Note embedding gain is okay here because FPGA bqiaud strcture is DF1
+% % gain is put into first section
+% [sos] = tf2sos(B,A);
+% 
+% % scale 
+% sos_scaled = (2^23)*sos;
+% 
+% % round to integer coefficients
+% sos_fixed = fix(sos_scaled)
 
-% Note embedding gain is okay here because FPGA bqiaud strcture is DF1
-% gain is put into first section
-[sos] = tf2sos(B,A);
+%% Generate fixed-point integer coefficients for FPGA (dont embed gain)
+[sos,g] = tf2sos(B,A)
 
 % scale 
-sos_scaled = (2^23)*sos;
+sos_scaled = (2^23)*sos
+
+%% Check stability and frequency response of each section individually
+figure;
+for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
+    B_fixed = sos_scaled(i,1:3);
+    A_fixed = sos_scaled(i,4:6);
+    disp(['Section ', num2str(i), ' is stable?']);
+    fixed_filter_stable = isstable(B_fixed,A_fixed)
+    subplot(2,2,i);
+    zplane(B_fixed,A_fixed);
+    title(['Section ', num2str(i), ' fixed-point zplane']);
+end 
+
+for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
+    B_fixed = sos_scaled(i,1:3);
+    A_fixed = sos_scaled(i,4:6);
+    disp(['Section ', num2str(i), ' is stable?']);
+    fixed_filter_stable = isstable(B_fixed,A_fixed)
+    figure;
+    freqz(B_fixed,A_fixed,2^10,fs);
+    title(['Section ', num2str(i), ' fixed-point zplane']);
+end 
+
+%% embed gain in section 2
+% i looked at all the frequency responses of the sections, and I think it
+% is best to order them the following way: sos2(gain embedded) - sos3 -
+% sos4 - sos1. These sections wil be cascaded in the FPGA, and this order
+% should avoid overflow
+
+sos_fixed_layout = sos_scaled; 
+sos_fixed_layout(1,:) = [g*sos_scaled(2,1:3), sos_scaled(2,4:6)];
+sos_fixed_layout(2,:) = sos_scaled(3,:);
+sos_fixed_layout(3,:) = sos_scaled(4,:);
+sos_fixed_layout(4,:) = sos_scaled(1,:);
 
 % round to integer coefficients
-sos_fixed = fix(sos_scaled)
+sos_fixed = fix(sos_fixed_layout)
 
-%% Check stability of each section individually
+%% Check stability and frequency response of each section individually
+figure;
+for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
+    B_fixed = sos_fixed(i,1:3);
+    A_fixed = sos_fixed(i,4:6);
+    disp(['Section ', num2str(i), ' is stable?']);
+    fixed_filter_stable = isstable(B_fixed,A_fixed)
+    subplot(2,2,i);
+    zplane(B_fixed,A_fixed);
+    title(['Section ', num2str(i), ' fixed-point zplane']);
+end 
 
 for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
     B_fixed = sos_fixed(i,1:3);
@@ -44,9 +97,10 @@ for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
     disp(['Section ', num2str(i), ' is stable?']);
     fixed_filter_stable = isstable(B_fixed,A_fixed)
     figure;
-    zplane(B_fixed,A_fixed);
+    freqz(B_fixed,A_fixed,2^10,fs);
     title(['Section ', num2str(i), ' fixed-point zplane']);
 end 
+
 
 %% check frequency response and zplane of fixed-point coefficients
 
@@ -107,7 +161,7 @@ fclose(fid2);
 oldFolder = cd('C:\Users\demea\ECG\SoC\IIR_Bandpass_test\MATLAB scripts');
 
 %% perform the filter
-yq = filter(B_fixed,A_fixed,xq_int);
+yq = sosfilt(sos_fixed,x);
 figure('Color',[1 1 1]);
 plot(yq);
 title("Expected Filter Output");
@@ -117,7 +171,7 @@ ylabel("Amplitude")
 %% expected impulse response of filter
 delta = zeros(1,500);
 delta(1) = 32767;
-hn = filter(B_fixed,A_fixed,delta);
+hn = sosfilt(sos_fixed,delta);
 figure('Color',[1 1 1]);
 plot(hn);
 title("Expected Impulse Response");
