@@ -1,3 +1,14 @@
+%% READ ME: SCRIPT DID NOT WORK FOR FPGA COEFF GEN
+% In the FPGA simulation, I was having trouble with overflow, reordering
+% the sections helped a little, but I was still stuggling with the gain.
+% I could not apply overall gain after the last section due to overflow, so
+% I tried embedding overall gain in the 1st section. The issue was the
+% overall gain is so low, truncation in the verilog code caused my impulse
+% response in the FPGA to be zero. Testing with a waveform worked kind of, 
+% I got the correct shape, but amplitude was signficantly less than what it
+% should have been, again due to small overall gain and fixed-point
+% math/truncation in the FPGA code. 
+
 %% Generates fixed-point coefficients for biquads implemented in FPGA. 
 % See biquad code: https://github.com/dominic-meads/Vivado-Projects/blob/main/IIR_Direct_form_1_Biquad/iir_DF1_Biquad_AXIS.v
 %
@@ -9,23 +20,38 @@ clear all
 clc
 
 fs = 500;
+fc1 = 5;
+fc2 = 15;
+Wc1 = fc1/(fs/2);
+Wc2 = fc2/(fs/2);
+[B,A] = butter(4,[Wc1,Wc2]);
+filter_stable = isstable(B,A)
 
-%% SOS and G generation using filterDesigner tool
-% Response Type = Bandpass
-% Design Method = IIR (Butterworth)
-% Filter Order = Specify order (8)
-% Fs = 500 Hz
-% Fc1 = 5 Hz
-% Fc2 = 15 Hz
-% Structure = Direct-Form I, Second-Order Sections
+%% check zplane and frequency response
+figure;
+zplane(B,A);
+title("Floating Point Coefficients Z-plane");
+figure;
+freqz(B,A,2^10,fs);
+title("Floating Point Coefficients Frequency Response");
 
-% get filter object with exported code
-Hd = filterDesigner_bandpass_gen_code;
+%% Generate fixed-point integer coefficients for FPGA
+% 
+% % Note embedding gain is okay here because FPGA bqiaud strcture is DF1
+% % gain is put into first section
+% [sos] = tf2sos(B,A);
+% 
+% % scale 
+% sos_scaled = (2^23)*sos;
+% 
+% % round to integer coefficients
+% sos_fixed = fix(sos_scaled)
 
-%% scale the filter coefficients for conversion to integer
+%% Generate fixed-point integer coefficients for FPGA (dont embed gain)
+[sos,g] = tf2sos(B,A)
 
 % scale 
-sos_scaled = (2^23)*Hd.sosMatrix;
+sos_scaled = (2^23)*sos
 
 %% Check stability and frequency response of each section individually
 figure;
@@ -49,17 +75,20 @@ for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
     title(['Section ', num2str(i), ' fixed-point zplane']);
 end 
 
-%% embed induvidual gains in numerator coeffs
-g = Hd.ScaleValues;
+%% embed gain in section 2
+% i looked at all the frequency responses of the sections, and I think it
+% is best to order them the following way: sos2(gain embedded) - sos3 -
+% sos4 - sos1. These sections wil be cascaded in the FPGA, and this order
+% should avoid overflow
 
-sos_with_g = sos_scaled; 
-sos_with_g(1,:) = [g(1)*sos_scaled(1,1:3), sos_scaled(1,4:6)];
-sos_with_g(2,:) = [g(2)*sos_scaled(2,1:3), sos_scaled(2,4:6)];
-sos_with_g(3,:) = [g(3)*sos_scaled(3,1:3), sos_scaled(3,4:6)];
-sos_with_g(4,:) = [g(4)*sos_scaled(4,1:3), sos_scaled(4,4:6)];
+sos_fixed_layout = sos_scaled; 
+sos_fixed_layout(1,:) = [g*sos_scaled(2,1:3), sos_scaled(2,4:6)];
+sos_fixed_layout(2,:) = sos_scaled(3,:);
+sos_fixed_layout(3,:) = sos_scaled(4,:);
+sos_fixed_layout(4,:) = sos_scaled(1,:);
 
 % round to integer coefficients
-sos_fixed = fix(sos_with_g)
+sos_fixed = fix(sos_fixed_layout)
 
 %% Check stability and frequency response of each section individually
 figure;
@@ -198,3 +227,5 @@ grid on;
 title("Phase Response of fixed-point Bandpass filter");
 xlabel('Frequency (Hz)');
 ylabel('Phase (degrees)');
+
+
