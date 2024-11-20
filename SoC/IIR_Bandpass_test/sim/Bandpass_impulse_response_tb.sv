@@ -18,27 +18,27 @@ module Bandpass_impulse_response_tb;
   localparam inout_width  = 16;
   localparam scale_factor = 23;
 
-  localparam sos0_b0_int_coeff = 111;
-  localparam sos0_b1_int_coeff = 223;
-  localparam sos0_b2_int_coeff = 111;
-  localparam sos0_a1_int_coeff = -16019049;
-  localparam sos0_a2_int_coeff = 7687567;
+  localparam sos0_b0_int_coeff = 514530;
+  localparam sos0_b1_int_coeff = 0;
+  localparam sos0_b2_int_coeff = -514530;
+  localparam sos0_a1_int_coeff = -15932677;
+  localparam sos0_a2_int_coeff = 7814858;
 
-  localparam sos1_b0_int_coeff = 8388608;
-  localparam sos1_b1_int_coeff = 16776439;
-  localparam sos1_b2_int_coeff = 8387831;
-  localparam sos1_a1_int_coeff = -15932677;
-  localparam sos1_a2_int_coeff = 7814858;
+  localparam sos1_b0_int_coeff = 514530;
+  localparam sos1_b1_int_coeff = 0;
+  localparam sos1_b2_int_coeff = -514530;
+  localparam sos1_a1_int_coeff = -16534189;
+  localparam sos1_a2_int_coeff = 8180250;
 
-  localparam sos2_b0_int_coeff = 8388608;
-  localparam sos2_b1_int_coeff = -16777215;
-  localparam sos2_b2_int_coeff = 8388608;
-  localparam sos2_a1_int_coeff = -16534190;
-  localparam sos2_a2_int_coeff = 8180250;
+  localparam sos2_b0_int_coeff = 498645;
+  localparam sos2_b1_int_coeff = 0;
+  localparam sos2_b2_int_coeff = -498645;
+  localparam sos2_a1_int_coeff = -16019050;
+  localparam sos2_a2_int_coeff = 7687568;
   
-  localparam sos3_b0_int_coeff = 8388608;
-  localparam sos3_b1_int_coeff = -16777216;
-  localparam sos3_b2_int_coeff = 8388607;
+  localparam sos3_b0_int_coeff = 498645;
+  localparam sos3_b1_int_coeff = 0;
+  localparam sos3_b2_int_coeff = -498645;
   localparam sos3_a1_int_coeff = -15487989;
   localparam sos3_a2_int_coeff = 7253728;
 

@@ -10,12 +10,12 @@
 // Target Devices: 7 Series
 // Tool Versions: Vivado 2024.1
 // Description: 
-//      4th order Buttworth bandpass filter with coefficents generated in MATLAB from the following parameters:
+//      8th order Buttworth bandpass filter with coefficents generated in MATLAB from the following parameters:
 //         - fs  = 500 Hz
 //         - fc1 = 5 Hz
 //         - fc2 = 15 Hz
 //  
-//      Filter consists of four DF1 sos filters cascaded together. The gain is embedded in the first section (sos0).
+//      Filter consists of four DF1 sos filters cascaded together. The indivdual gain is embedded in the numerator coefficients
 //      All the coefficients in MATLAB are multiplied by 2^23 for an integer coefficent width of 25 bits (max for 
 //      7 series DSP48E1).
 // 
@@ -36,30 +36,30 @@ module iir_4th_order_bandpass_axis #(
   parameter scale_factor = 23,     // multiplying coefficients by 2^23
   
   // sos0 coeffs
-  parameter sos0_b0_int_coeff = 111,
-  parameter sos0_b1_int_coeff = 223,
-  parameter sos0_b2_int_coeff = 111,
-  parameter sos0_a1_int_coeff = -16019049,
-  parameter sos0_a2_int_coeff = 7687567,
+  parameter sos0_b0_int_coeff = 514530,
+  parameter sos0_b1_int_coeff = 0,
+  parameter sos0_b2_int_coeff = -514530,
+  parameter sos0_a1_int_coeff = -15932677,
+  parameter sos0_a2_int_coeff = 7814858,
 
   // sos1 coeffs
-  parameter sos1_b0_int_coeff = 8388608,
-  parameter sos1_b1_int_coeff = 16776439,
-  parameter sos1_b2_int_coeff = 8387831,
-  parameter sos1_a1_int_coeff = -15932677,
-  parameter sos1_a2_int_coeff = 7814858,
+  parameter sos1_b0_int_coeff = 514530,
+  parameter sos1_b1_int_coeff = 0,
+  parameter sos1_b2_int_coeff = -514530,
+  parameter sos1_a1_int_coeff = -16534189,
+  parameter sos1_a2_int_coeff = 8180250,
 
   // sos2 coeffs
-  parameter sos2_b0_int_coeff = 8388608,
-  parameter sos2_b1_int_coeff = -16777215,
-  parameter sos2_b2_int_coeff = 8388608,
-  parameter sos2_a1_int_coeff = -16534190,
-  parameter sos2_a2_int_coeff = 8180250,
+  parameter sos2_b0_int_coeff = 498645,
+  parameter sos2_b1_int_coeff = 0,
+  parameter sos2_b2_int_coeff = -498645,
+  parameter sos2_a1_int_coeff = -16019050,
+  parameter sos2_a2_int_coeff = 7687568,
 
   // sos3 coeffs
-  parameter sos3_b0_int_coeff = 8388608,
-  parameter sos3_b1_int_coeff = -16777216,
-  parameter sos3_b2_int_coeff = 8388607,
+  parameter sos3_b0_int_coeff = 498645,
+  parameter sos3_b1_int_coeff = 0,
+  parameter sos3_b2_int_coeff = -498645,
   parameter sos3_a1_int_coeff = -15487989,
   parameter sos3_a2_int_coeff = 7253728
 )(
