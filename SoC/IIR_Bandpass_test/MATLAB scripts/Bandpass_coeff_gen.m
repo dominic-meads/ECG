@@ -137,7 +137,7 @@ cd 'C:\Users\demea\ECG\SoC\IIR_Bandpass_test\IIR_Bandpass_test\IIR_Bandpass_test
 fid1 = fopen('10Hz_sine_wave_with_60_Hz_noise.txt','w');
 fprintf(fid1,"%d\n",xq_int);
 fclose(fid1);
-fid2 = fopen('Bandpass_impulse_response_output.txt','w'); % create output file for tb
+fid2 = fopen('Bandpass_impulse_response_output.txt','r'); % create output file for tb
 fclose(fid2);
 % return to original directory
 oldFolder = cd('C:\Users\demea\ECG\SoC\IIR_Bandpass_test\MATLAB scripts');
