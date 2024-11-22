@@ -120,7 +120,7 @@ b = fir1(1000,Wc);
 freqz(b,1,2^10,fs);
 
 
-ecg_filt1 = filtfilt(b,1,ecg_pcb);
+ecg_filt1 = filtfilt(b,1,ecg_bo);
 ecg_filt2 = smoothdata(ecg_filt1);
 ecg_filt_seg = Vref*(ecg_filt2(1250:2250)./4095); 
 ts = (0:length(ecg_filt_seg)-1)/(fs);

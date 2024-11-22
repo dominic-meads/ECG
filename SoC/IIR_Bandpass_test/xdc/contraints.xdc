@@ -7,12 +7,12 @@
 
 ## Clock signal 125 MHz
 
-set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { clk }]; #IO_L13P_T2_MRCC_35 Sch=sysclk
-create_clock -add -name sys_clk_pin -period 8.00 -waveform {0 4} [get_ports { clk }];
+set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { clk_in }]; #IO_L13P_T2_MRCC_35 Sch=sysclk
+create_clock -add -name sys_clk_pin -period 8.00 -waveform {0 4} [get_ports { clk_in }];
 
 ##Switches
 
-#set_property -dict { PACKAGE_PIN M20   IOSTANDARD LVCMOS33 } [get_ports { m_axis_tready }]; #IO_L7N_T1_AD2N_35 Sch=sw[0]
+set_property -dict { PACKAGE_PIN M20   IOSTANDARD LVCMOS33 } [get_ports { m_axis_tready }]; #IO_L7N_T1_AD2N_35 Sch=sw[0]
 #set_property -dict { PACKAGE_PIN M19   IOSTANDARD LVCMOS33 } [get_ports { s_axis_spi_tready }]; #IO_L7P_T1_AD2P_35 Sch=sw[1]
 
 ##RGB LEDs
@@ -128,8 +128,8 @@ set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports { m_axis
 
 set_property -dict { PACKAGE_PIN U5    IOSTANDARD LVCMOS33 } [get_ports { m_axis_tdata[14] }]; #IO_L19N_T3_VREF_13 Sch=ck_io[26]
 set_property -dict { PACKAGE_PIN V5    IOSTANDARD LVCMOS33 } [get_ports { m_axis_tdata[15] }]; #IO_L6N_T0_VREF_13 Sch=ck_io[27]
-#set_property -dict { PACKAGE_PIN V6    IOSTANDARD LVCMOS33 } [get_ports { m_axis_mm2s_tlast }]; #IO_L22P_T3_13 Sch=ck_io[28]
-#set_property -dict { PACKAGE_PIN U7    IOSTANDARD LVCMOS33 } [get_ports { m_axis_tvalid }]; #IO_L11P_T1_SRCC_13 Sch=ck_io[29]
+#set_property -dict { PACKAGE_PIN V6    IOSTANDARD LVCMOS33 } [get_ports { m_axis_tready }]; #IO_L22P_T3_13 Sch=ck_io[28]
+set_property -dict { PACKAGE_PIN U7    IOSTANDARD LVCMOS33 } [get_ports { m_axis_tvalid }]; #IO_L11P_T1_SRCC_13 Sch=ck_io[29]
 #set_property -dict { PACKAGE_PIN V7    IOSTANDARD LVCMOS33 } [get_ports { ck_io[30] }]; #IO_L11N_T1_SRCC_13 Sch=ck_io[30]
 #set_property -dict { PACKAGE_PIN U8    IOSTANDARD LVCMOS33 } [get_ports { ck_io[31] }]; #IO_L17N_T2_13 Sch=ck_io[31]
 #set_property -dict { PACKAGE_PIN V8    IOSTANDARD LVCMOS33 } [get_ports { ck_io[32] }]; #IO_L15P_T2_DQS_13 Sch=ck_io[32]
