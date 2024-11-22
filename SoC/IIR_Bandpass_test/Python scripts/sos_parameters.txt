@@ -1,3 +1,11 @@
+
+
+
+--------------VERILOG CODE GENERATION--------------
+
+
+
+--------------parameters for module--------------
 // sos0 coeffs
 parameter sos0_b0_int_coeff = 514530,
 parameter sos0_b1_int_coeff = 0,
@@ -25,4 +33,68 @@ parameter sos3_b1_int_coeff = 0,
 parameter sos3_b2_int_coeff = -498645,
 parameter sos3_a1_int_coeff = -15487989,
 parameter sos3_a2_int_coeff = 7253728,
+
+
+
+
+--------------localparams for module instantiation--------------
+// sos0 coeffs
+localparam sos0_b0_int_coeff = 514530,
+localparam sos0_b1_int_coeff = 0,
+localparam sos0_b2_int_coeff = -514530,
+localparam sos0_a1_int_coeff = -15932677,
+localparam sos0_a2_int_coeff = 7814858,
+
+// sos1 coeffs
+localparam sos1_b0_int_coeff = 514530,
+localparam sos1_b1_int_coeff = 0,
+localparam sos1_b2_int_coeff = -514530,
+localparam sos1_a1_int_coeff = -16534189,
+localparam sos1_a2_int_coeff = 8180250,
+
+// sos2 coeffs
+localparam sos2_b0_int_coeff = 498645,
+localparam sos2_b1_int_coeff = 0,
+localparam sos2_b2_int_coeff = -498645,
+localparam sos2_a1_int_coeff = -16019050,
+localparam sos2_a2_int_coeff = 7687568,
+
+// sos3 coeffs
+localparam sos3_b0_int_coeff = 498645,
+localparam sos3_b1_int_coeff = 0,
+localparam sos3_b2_int_coeff = -498645,
+localparam sos3_a1_int_coeff = -15487989,
+localparam sos3_a2_int_coeff = 7253728,
+
+
+
+
+--------------module instantiation template for parameters--------------
+// sos0 coeffs
+.sos0_b0_int_coeff(sos0_b0_int_coeff),
+.sos0_b1_int_coeff(sos0_b1_int_coeff),
+.sos0_b2_int_coeff(sos0_b2_int_coeff),
+.sos0_a1_int_coeff(sos0_a1_int_coeff),
+.sos0_a2_int_coeff(sos0_a2_int_coeff),
+
+// sos1 coeffs
+.sos1_b0_int_coeff(sos1_b0_int_coeff),
+.sos1_b1_int_coeff(sos1_b1_int_coeff),
+.sos1_b2_int_coeff(sos1_b2_int_coeff),
+.sos1_a1_int_coeff(sos1_a1_int_coeff),
+.sos1_a2_int_coeff(sos1_a2_int_coeff),
+
+// sos2 coeffs
+.sos2_b0_int_coeff(sos2_b0_int_coeff),
+.sos2_b1_int_coeff(sos2_b1_int_coeff),
+.sos2_b2_int_coeff(sos2_b2_int_coeff),
+.sos2_a1_int_coeff(sos2_a1_int_coeff),
+.sos2_a2_int_coeff(sos2_a2_int_coeff),
+
+// sos3 coeffs
+.sos3_b0_int_coeff(sos3_b0_int_coeff),
+.sos3_b1_int_coeff(sos3_b1_int_coeff),
+.sos3_b2_int_coeff(sos3_b2_int_coeff),
+.sos3_a1_int_coeff(sos3_a1_int_coeff),
+.sos3_a2_int_coeff(sos3_a2_int_coeff),
 

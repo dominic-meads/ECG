@@ -17,9 +17,29 @@ os.chdir(r'C:\Users\demea\ECG\SoC\IIR_Bandpass_test\Python scripts')  # change b
 coeff_list = ["b0", "b1", "b2", "a1", "a2"]
 
 with open('sos_parameters.txt', 'w') as file:
-    for i in range(sos_coeff.shape[0]):
+   
+   file.write("--------------VERILOG CODE GENERATION--------------\n")
+
+   file.write("\n\n\n--------------parameters for module--------------\n")
+   for i in range(sos_coeff.shape[0]):
       file.write("// sos" + str(i) + " coeffs\n")
       for j in range(5):
          string = "parameter sos" + str(i) + "_" + coeff_list[j] + "_int_coeff = " + str(sos_coeff.loc[i][j]) + ","
+         file.write(string + "\n")
+      file.write("\n")
+
+   file.write("\n\n\n--------------localparams for module instantiation--------------\n")
+   for i in range(sos_coeff.shape[0]):
+      file.write("// sos" + str(i) + " coeffs\n")
+      for j in range(5):
+         string = "localparam sos" + str(i) + "_" + coeff_list[j] + "_int_coeff = " + str(sos_coeff.loc[i][j]) + ","
+         file.write(string + "\n")
+      file.write("\n")
+
+   file.write("\n\n\n--------------module instantiation template for parameters--------------\n")
+   for i in range(sos_coeff.shape[0]):
+      file.write("// sos" + str(i) + " coeffs\n")
+      for j in range(5):
+         string = ".sos" + str(i) + "_" + coeff_list[j] + "_int_coeff(" + "sos" + str(i) + "_" + coeff_list[j] + "_int_coeff" + "),"
          file.write(string + "\n")
       file.write("\n")
