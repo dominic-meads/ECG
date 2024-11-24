@@ -86,9 +86,9 @@ module ADC_to_iir_test_top #(
   );
 
   iir_4th_order_bandpass_axis #(
-    .coeff_width(25),
-    .inout_width(16),
-    .scale_factor(23),
+    .coeff_width(coeff_width),
+    .inout_width(inout_width),
+    .scale_factor(scale_factor),
 
     .sos0_b0_int_coeff(sos0_b0_int_coeff),
     .sos0_b1_int_coeff(sos0_b1_int_coeff),
