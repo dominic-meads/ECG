@@ -40,6 +40,7 @@ module ADC_to_iir_test_top #(
   input rst_n,
   input miso,
   input m_axis_tready,  // ready signal from upstream device
+  input sel,            // output mux select (see end of file)
   output mosi,
   output sck,
   output cs,
@@ -49,6 +50,7 @@ module ADC_to_iir_test_top #(
 
   // intermediate signals
   wire [inout_width-1:0] w_spi_to_iir_axis_tdata;
+  wire [inout_width-1:0] w_iir_output_axis_tdata;
   wire w_spi_to_iir_axis_tvalid;
   wire w_iir_to_spi_axis_tready;
   wire w_clk_50MHz;
@@ -117,9 +119,13 @@ module ADC_to_iir_test_top #(
     .s_axis_tvalid(w_spi_to_iir_axis_tvalid),
     .s_axis_tdata(w_spi_to_iir_axis_tdata),
     .m_axis_tready(m_axis_tready),
-    .m_axis_tdata(m_axis_tdata),
+    .m_axis_tdata(w_iir_output_axis_tdata),
     .m_axis_tvalid(m_axis_tvalid),
     .s_axis_tready(w_iir_to_spi_axis_tready)
   );
+
+  // this mux controls whether the raw data coming out of the ADC is seen on the output, or if it is the filtered signal
+  // I only have 16 inputs on my logic analyzer, so I cant view both at the same time. 
+  assign m_axis_tdata = sel ? w_spi_to_iir_axis_tdata : w_iir_output_axis_tdata;
 
 endmodule 
