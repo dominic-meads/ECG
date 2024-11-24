@@ -88,14 +88,14 @@ module iir_DF1_Biquad_AXIS #(
   reg signed [inout_width-1:0] r_y_z2 = 0;
 
   // multiplication wires
-  reg signed [inout_width + coeff_width-1:0] r_product_b0 = 0;
-  reg signed [inout_width + coeff_width-1:0] r_product_b1 = 0;
-  reg signed [inout_width + coeff_width-1:0] r_product_b2 = 0;
-  reg signed [inout_width + coeff_width-1:0] r_product_a1 = 0;
-  reg signed [inout_width + coeff_width-1:0] r_product_a2 = 0;
+  wire signed [inout_width + coeff_width-1:0] w_product_b0;
+  wire signed [inout_width + coeff_width-1:0] w_product_b1;
+  wire signed [inout_width + coeff_width-1:0] w_product_b2;
+  wire signed [inout_width + coeff_width-1:0] w_product_a1;
+  wire signed [inout_width + coeff_width-1:0] w_product_a2;
 
   // acummulate wire
-  reg signed [inout_width + coeff_width-1:0] r_sum = 0; 
+  wire signed [inout_width + coeff_width-1:0] w_sum; 
 
   // states
   localparam READY = 1'b0;
@@ -190,26 +190,25 @@ module iir_DF1_Biquad_AXIS #(
         else 
           begin
             if (r_iir_en) 
-              begin
-                // signal delay blocks 
+              begin 
                 r_x    <= s_axis_tdata;
                 r_x_z1 <= r_x;
                 r_x_z2 <= r_x_z1;
-                r_y_z1 <= r_sum >>> scale_factor;  // divide by the same 2^scale_factor value the coefficients were multiplied by
+                r_y_z1 <= w_sum >>> scale_factor;  // divide by the same 2^scale_factor value the coefficients were multiplied by
                 r_y_z2 <= r_y_z1;
-
-                // multiplications
-                r_product_b0 <= r_x    * b0_fixed;
-                r_product_b1 <= r_x_z1 * b1_fixed;
-                r_product_b2 <= r_x_z2 * b2_fixed;
-                r_product_a1 <= r_y_z1 * -a1_fixed;
-                r_product_a2 <= r_y_z2 * -a2_fixed;
-
-                // accumulate
-                r_sum <= r_product_b0 + r_product_b1 + r_product_b2 + r_product_a1 + r_product_a2;
               end 
           end 
     end
+
+  // multiply
+  assign w_product_b0 = r_x    * b0_fixed;
+  assign w_product_b1 = r_x_z1 * b1_fixed;
+  assign w_product_b2 = r_x_z2 * b2_fixed;
+  assign w_product_a1 = r_y_z1 * -a1_fixed;
+  assign w_product_a2 = r_y_z2 * -a2_fixed;
+
+  // accumulate
+  assign w_sum = w_product_b0 + w_product_b1 + w_product_b2 + w_product_a1 + w_product_a2;
 
   // output assignments
   assign m_axis_tdata  = r_m_axis_tdata;
