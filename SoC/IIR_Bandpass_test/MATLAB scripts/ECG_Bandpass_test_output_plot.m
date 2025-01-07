@@ -19,14 +19,14 @@ plot(t,v_ecg_raw);
 title('Raw ECG signal from AFE');
 xlabel('Time (s)');
 ylabel('ECG Amplitude (V)');
-
+hold on;
 
 bp_output_table = readtable('ECG_bandpass_test.csv', 'VariableNamingRule', 'preserve');
 ecg_bp_filtered = bp_output_table.axis_tdata;
 v_ecg_bp = vref*(ecg_bp_filtered./4095);
 t = (0:length(v_ecg_bp)-1)/(fs);
-figure('Color',[1,1,1]);
-plot(t,v_ecg_bp);
+%figure('Color',[1,1,1]);
+plot(t,v_ecg_bp,'r');
 title('ECG signal filtered with 8th order Bandpass (Fpass = 5-15 Hz)');
 xlabel('Time (s)');
 ylabel('ECG Amplitude (V)');
