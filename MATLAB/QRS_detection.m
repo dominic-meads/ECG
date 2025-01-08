@@ -163,7 +163,7 @@ legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma),
 
 ecg_diff_2 = diff(ecg_ma);  % get slope of MA-filtered ECG
 
-ecg_diff_2 = ecg_diff_2.*2; % try increasing amplitude? 
+ecg_diff_2 = ecg_diff_2.*10; % try increasing amplitude? 
 
 n_ma_2 = 40;
 b_ma_2 = (1/n_ma_2)*ones(1,n_ma_2);
