@@ -4,7 +4,7 @@
 % output data format is two's complement
 
 clear all
-close all
+%close all
 clc
 
 fs = 500;
