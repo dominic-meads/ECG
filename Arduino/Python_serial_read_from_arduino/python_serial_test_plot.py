@@ -1,7 +1,6 @@
 # NOTES: Run program in separate dedicated terminal
 # sources: https://www.youtube.com/watch?v=Ercd-Ip5PfQ&t=302s
 
-from itertools import count
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -11,13 +10,8 @@ os.chdir('C:/Users/demea/ECG/Arduino/Python_serial_read_from_arduino')
 
 plt.style.use('fivethirtyeight')
 
-x_vals = []
-y_vals = []
 
-index = count()
-
-
-def animate(i):
+def animate_entire_graph(i):  # plots the entire graph and animates it
     data = pd.read_csv('arduino_data.csv')
     x = data['sample number']
     y = data['value']
@@ -30,7 +24,7 @@ def animate(i):
     plt.tight_layout()
 
 try:
-  ani = FuncAnimation(plt.gcf(), animate, interval=10)
+  ani = FuncAnimation(plt.gcf(), animate_entire_graph, interval=10)
 
   plt.tight_layout()
   plt.show()
