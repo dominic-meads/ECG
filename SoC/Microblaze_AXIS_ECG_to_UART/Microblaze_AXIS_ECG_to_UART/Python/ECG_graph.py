@@ -25,11 +25,10 @@ Ts = 1/fs # sampling period
 t = x*Ts  # actual time
 
 # plot
-fig, ax = plt.subplots()
-ax.plot(t, v*1000, linewidth=1.0)
+plt.plot(t, v*1000, linewidth=1.0)
 plt.xlabel('Time (s)')
 plt.ylabel('ECG Amplitude (mV)')
 plt.title('ECG (Lead I)')
-ax.minorticks_on()
+plt.minorticks_on()
 plt.grid()
 plt.show()

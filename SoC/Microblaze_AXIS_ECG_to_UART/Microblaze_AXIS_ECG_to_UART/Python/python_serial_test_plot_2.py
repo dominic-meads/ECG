@@ -17,17 +17,32 @@ def animate_window(i):  # moving window of a segment of graph
     x = data['sample number'][-1000:]
     y = data['value'][-1000:]
 
+    # convert data from integer to voltage (result should be in mV)
+    vref = 3.12                # reference voltage from ADC
+    v_common_mode = 1.5        # common mode voltage offset from 50-60 Hz
+    gain = 950                 # ECG gain from analog front-end
+    v = (y/4095) * (vref)       
+    v -= v_common_mode         # remove common mode offset
+    v /= gain                  # remove gain of opamp stage in front-end
+
+    # convert sample number to time
+    fs = 500  # sampling frequency
+    Ts = 1/fs # sampling period
+    t = x*Ts  # actual time
+
     plt.cla()
 
-    plt.plot(x, y, label='ECG Data')
-
+    plt.plot(t, v*1000, linewidth=1.0)
+    plt.xlabel('Time (s)')
+    plt.ylabel('ECG Amplitude (mV)')
+    plt.title('ECG (Lead I)')
+    plt.ylim(-2,2)
     plt.legend(loc='upper left')
-    plt.tight_layout()
 
 try:
-  ani = FuncAnimation(plt.gcf(), animate_window, interval=10)
+  ani = FuncAnimation(plt.gcf(), animate_window, interval=5)
 
-  plt.tight_layout()
+  plt.grid()
   plt.show()
 except KeyboardInterrupt:
   pass
