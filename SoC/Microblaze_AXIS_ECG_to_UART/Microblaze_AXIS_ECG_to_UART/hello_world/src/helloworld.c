@@ -35,8 +35,8 @@ int main()
 
     microblaze_disable_interrupts();
 
-    print("Hello World\n\r");
-    print("Successfully ran Hello World application");
+    //print("Hello World\n\r");
+    //print("Successfully ran Hello World application");
 
     int data[30];
 
