@@ -28,8 +28,7 @@
 // Revision 0.01 - File Created
 // Additional Comments:
 //
-//      See coefficient generation script and testing here: https://github.com/dominic-meads/ECG/blob/main/SoC/Microblaze_AXIS_ECG_to_UART/Microblaze_AXIS_ECG_to_UART/MATLAB/Bandpass_offset_noise_removal_coeff_gen.m
-//      
+//      See coefficient generation script and testing here: https://github.com/dominic-meads/ECG/blob/main/SoC/Microblaze_AXIS_ECG_to_UART/MATLAB/Bandpass_offset_noise_removal_coeff_gen.m
 //////////////////////////////////////////////////////////////////////////////////
 module iir_bandpass_noise_offset_removal_axis #(
   parameter coeff_width  = 25,     // coefficient bit width
