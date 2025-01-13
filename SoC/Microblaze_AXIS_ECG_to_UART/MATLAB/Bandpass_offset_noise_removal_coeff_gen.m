@@ -134,14 +134,14 @@ ylabel('Signal');
 xlabel('Time (s)');
 
 % must put files in xsim directory for vivado
-cd 'C:\Users\demea\ECG\SoC\IIR_Bandpass_test\IIR_Bandpass_test\IIR_Bandpass_test.sim\sim_1\behav\xsim';
+cd 'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART.sim\sim_1\behav\xsim';
 fid1 = fopen('10Hz_sine_wave_with_60_Hz_noise.txt','w');
 fprintf(fid1,"%d\n",xq_int);
 fclose(fid1);
 fid2 = fopen('Bandpass_impulse_response_output.txt','r'); % create output file for tb
 fclose(fid2);
 % return to original directory
-oldFolder = cd('C:\Users\demea\ECG\SoC\IIR_Bandpass_test\MATLAB scripts');
+oldFolder = cd('C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\MATLAB');
 
 %% perform the filter
 yq = sosfilt(sos_fixed,x);
@@ -162,13 +162,13 @@ title("Expected Impulse Response");
 %% get impulse response output of FPGA simulation
 
 % output file in vivado xsim directory
-cd 'C:\Users\demea\ECG\SoC\IIR_Bandpass_test\IIR_Bandpass_test\IIR_Bandpass_test.sim\sim_1\behav\xsim';
+cd 'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART.sim\sim_1\behav\xsim';
 fid2 = fopen('Bandpass_impulse_response_output.txt','r');
 % get the impulse response samples
 hn_f = fscanf(fid2,"%d");
 fclose(fid2);
 % return to original directory
-oldFolder = cd('C:\Users\demea\ECG\SoC\IIR_Bandpass_test\MATLAB scripts');
+oldFolder = cd('C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\MATLAB');
 
 figure('Color',[1 1 1]);
 plot(hn_f);
