@@ -72,9 +72,38 @@ title('ECG signal (PCB Test)');
 xlabel('Time (s)');
 ylabel('ECG Amplitude (V)');
 
+%% Pre-conditioning Bandpass filter design
+% noise and offset removal
+fcL = 2;
+fcH = 48;
+WcL = fcL/(fs/2);
+WcH = fcH/(fs/2);
+
+[b_rem, a_rem] = butter(6,[WcL, WcH]); 
+
+figure('Color', [1,1,1]);
+zplane(b_rem,a_rem);
+figure('Color', [1,1,1]);
+freqz(b_rem,a_rem,2^10,fs);
+
+%% Pre-conditioning Bandpass filter application
+
+% concat all data into one big ecg
+ecg_test = [ecg_clean; ecg_noisy; ecg_bd; ecg_fast; ecg_pcb];
+
+ecg_noise_offset_removal = filtfilt(b_rem,a_rem,ecg_test);
+
+t = (0:length(ecg_noise_offset_removal)-1)/fs;
+figure('Color',[1,1,1]);
+plot(t,ecg_test,"Color",[0.6 0.87 1]);
+hold on;
+plot(t,ecg_noise_offset_removal,"Color",[1 0.3 0.3]);
+ylabel("Amplitude");
+xlabel("Time (s)");
+legend({'ECG Raw','Offset and noise removed'});
 %% Bandpass filter design
 fcL = 5;
-fcH = 12;
+fcH = 15;
 WcL = fcL/(fs/2);
 WcH = fcH/(fs/2);
 
@@ -87,14 +116,11 @@ freqz(b_bp,a_bp,2^10,fs);
 
 %% Bandpass Application
 
-% concat all data into one big ecg
-ecg_test = [ecg_clean; ecg_noisy; ecg_bd; ecg_fast; ecg_pcb];
-
-ecg_bp = filtfilt(b_bp,a_bp,ecg_test);
+ecg_bp = filtfilt(b_bp,a_bp,ecg_noise_offset_removal);
 
 t = (0:length(ecg_bp)-1)/fs;
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.6 0.87 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.6 0.87 1]);
 hold on;
 plot(t,ecg_bp,"Color",[1 0.3 0.3]);
 ylabel("Amplitude");
@@ -110,7 +136,7 @@ ecg_diff = diff(ecg_bp);
 %% Derivative Application
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.6 0.87 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.6 0.87 1]);
 hold on;
 plot(t,ecg_bp,"Color",[1 0.3 0.3]);
 hold on;
@@ -124,7 +150,7 @@ legend({'ECG Raw','BP Filtered', 'Derivative'});
 ecg_sqr = ecg_diff.^2;
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.6 0.87 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.6 0.87 1]);
 hold on;
 plot(t,ecg_bp,"Color",[1 0.3 0.3]);
 hold on;
@@ -146,7 +172,7 @@ b_ma = (1/n_ma)*ones(1,n_ma);
 ecg_ma = filtfilt(b_ma,1,ecg_sqr);  
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.6 0.87 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.6 0.87 1]);
 hold on;
 plot(t,ecg_bp,"Color",[1 0.3 0.3]);
 hold on;
@@ -163,7 +189,7 @@ legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma),
 
 ecg_diff_2 = diff(ecg_ma);  % get slope of MA-filtered ECG
 
-ecg_diff_2 = ecg_diff_2.*10; % try increasing amplitude? 
+ecg_diff_2 = ecg_diff_2.*16; % try increasing amplitude? 
 
 n_ma_2 = 40;
 b_ma_2 = (1/n_ma_2)*ones(1,n_ma_2);
@@ -172,7 +198,7 @@ ecg_diff_2_smooth = filtfilt(b_ma_2,1,ecg_diff_2);
 %% 2nd Derivative Application
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.6 0.87 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.6 0.87 1]);
 hold on;
 plot(t,ecg_bp,"Color",[1 0.3 0.3]);
 hold on;
@@ -192,7 +218,7 @@ legend({'ECG Raw', 'BP Filtered', 'Derivative', 'Squared', strcat(num2str(n_ma),
 %% Plot Raw, 2nd Derivative (Smoothed), and MA-filtered Signals
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test,"Color",[0.45 0.70 1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.45 0.70 1]);
 hold on;
 plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1],"LineWidth",1.5);
 hold on;
@@ -208,21 +234,29 @@ legend({'ECG Raw', strcat(num2str(n_ma), '-Point Moving Average'), 'Smoothed 2nd
 % find maximums of 2nd derivative signal
 p = ecg_diff_2_smooth;  % rename for easier reading in the "find()" function
 L = length(ecg_diff_2);
-ecg_diff_2_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;  
+ecg_diff_2_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1; 
+
+% threshold (reject maximums that are less than a threshold)
+diff_2_threshold = 300; 
+indicies_to_remove = find(ecg_diff_2_smooth(ecg_diff_2_max) < diff_2_threshold);
+ecg_diff_2_max(indicies_to_remove) = [];  % remove maximums less than threshold
 
 % find maximums of moving-averaged signal
 p = ecg_ma;
 L = length(ecg_ma);
 ecg_ma_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;
+ecg_ma_max = ecg_ma_max(2:end);  % remove first element (false max)
 
 figure('Color',[1,1,1]);
+plot(t,ecg_noise_offset_removal,"Color",[0.45 0.70 1]);
+hold on;
 plot(t,[ecg_ma; 0],"Color",[0.6 0.4 1]);
 hold on;
 plot(ecg_ma_max/fs,ecg_ma(ecg_ma_max),'r*')
 hold on;
 plot(t,[ecg_diff_2_smooth; 0; 0]);
 hold on;
-plot(ecg_diff_2_max/fs,ecg_diff_2(ecg_diff_2_max),'b*');
+plot(ecg_diff_2_max/fs,ecg_diff_2_smooth(ecg_diff_2_max),'b*');
 ylabel("Amplitude");
 xlabel("Time (s)");
 
@@ -239,7 +273,7 @@ for k = 1:numel(ecg_ma_max)
         i_end = numel(ecg_diff_2);  % if the interval end is greater than the length of signal, just use the end of signal
     end
 
-    x_intrvl = ecg_test(i_start:i_end);
+    x_intrvl = ecg_noise_offset_removal(i_start:i_end);
     pp = find(x_intrvl==max(x_intrvl),1);
     ppi(k) = pp+i_start-1;
 end
@@ -252,9 +286,9 @@ ylabel("Amplitude");
 xlabel("Time (s)");
 
 figure('Color',[1,1,1]);
-plot(t,ecg_test);
+plot(t,ecg_noise_offset_removal);
 hold on; 
-h = plot(ppi/fs,ecg_test(ppi),'s');
+h = plot(ppi/fs,ecg_noise_offset_removal(ppi),'s');
 set(h,'MarkerSize',7);
 set(h,'MarkerEdgeColor',[0.5,0.5,0.5]);
 set(h,'MarkerFaceColor','r');
