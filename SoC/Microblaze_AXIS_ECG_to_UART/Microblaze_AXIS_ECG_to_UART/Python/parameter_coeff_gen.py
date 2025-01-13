@@ -32,7 +32,7 @@ with open('sos_parameters.txt', 'w') as file:
    for i in range(sos_coeff.shape[0]):
       file.write("// sos" + str(i) + " coeffs\n")
       for j in range(5):
-         string = "localparam sos" + str(i) + "_" + coeff_list[j] + "_int_coeff = " + str(sos_coeff.loc[i][j]) + ","
+         string = "localparam sos" + str(i) + "_" + coeff_list[j] + "_int_coeff = " + str(sos_coeff.loc[i][j]) + ";"
          file.write(string + "\n")
       file.write("\n")
 
