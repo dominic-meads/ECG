@@ -4,7 +4,7 @@ import os
 # current_directory = os.getcwd()
 # print("Current Directory:", current_directory)
 
-os.chdir(r'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART\MATLAB')  # cd to where the coefficients are
+os.chdir(r'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\MATLAB')  # cd to where the coefficients are
 
 #current_directory = os.getcwd()
 #print("changed Directory:", current_directory)
@@ -12,7 +12,7 @@ os.chdir(r'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_EC
 sos_coeff = pd.read_csv('fixed_point_int_coeff_4th_order_bp.csv')  # read in coeffs
 print(sos_coeff)
 
-os.chdir(r'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Microblaze_AXIS_ECG_to_UART\Python')  # change back to working directory
+os.chdir(r'C:\Users\demea\ECG\SoC\Microblaze_AXIS_ECG_to_UART\Python')  # change back to working directory
 
 coeff_list = ["b0", "b1", "b2", "a1", "a2"]
 

@@ -2,7 +2,7 @@ import serial
 import csv
 import os
 
-os.chdir('C:/Users/demea/ECG/SoC/Microblaze_AXIS_ECG_to_UART/Microblaze_AXIS_ECG_to_UART/Python')
+os.chdir('C:/Users/demea/ECG/SoC/Microblaze_AXIS_ECG_to_UART/Python')
 
 ser = serial.Serial(port='COM10',baudrate=115200)
 sample_number = 0

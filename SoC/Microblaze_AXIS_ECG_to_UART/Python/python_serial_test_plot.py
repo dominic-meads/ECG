@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import os
 
-os.chdir('C:/Users/demea/ECG/SoC/Microblaze_AXIS_ECG_to_UART/Microblaze_AXIS_ECG_to_UART/Python')
+os.chdir('C:/Users/demea/ECG/SoC/Microblaze_AXIS_ECG_to_UART/Python')
 
 plt.style.use('fivethirtyeight')
 
