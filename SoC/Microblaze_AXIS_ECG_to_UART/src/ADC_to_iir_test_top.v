@@ -1,5 +1,5 @@
 module ADC_to_iir_test_top #(
-  parameter FCLK  = 50e6,  // clk frequency
+  parameter FCLK  = 60e6,  // clk frequency
   parameter FSMPL = 500,   // sampling freqeuncy 
   parameter SGL   = 1,     // sets ADC to single-ended
   parameter ODD   = 0,     // sets ADC sample input to channel 0
@@ -8,35 +8,35 @@ module ADC_to_iir_test_top #(
   parameter inout_width  = 16,     // input and output data wdth
   parameter scale_factor = 23,     // multiplying coefficients by 2^23
   
-  // sos0 coeffs
-  parameter sos0_b0_int_coeff = 514530,
+ // sos0 coeffs
+  parameter sos0_b0_int_coeff = 2174371,
   parameter sos0_b1_int_coeff = 0,
-  parameter sos0_b2_int_coeff = -514530,
-  parameter sos0_a1_int_coeff = -15932677,
-  parameter sos0_a2_int_coeff = 7814858,
+  parameter sos0_b2_int_coeff = -2174371,
+  parameter sos0_a1_int_coeff = -11556035,
+  parameter sos0_a2_int_coeff = 5587438,
 
   // sos1 coeffs
-  parameter sos1_b0_int_coeff = 514530,
+  parameter sos1_b0_int_coeff = 2174371,
   parameter sos1_b1_int_coeff = 0,
-  parameter sos1_b2_int_coeff = -514530,
-  parameter sos1_a1_int_coeff = -16534189,
-  parameter sos1_a2_int_coeff = 8180250,
+  parameter sos1_b2_int_coeff = -2174371,
+  parameter sos1_a1_int_coeff = -16621402,
+  parameter sos1_a2_int_coeff = 8238155,
 
   // sos2 coeffs
-  parameter sos2_b0_int_coeff = 498645,
+  parameter sos2_b0_int_coeff = 1949056,
   parameter sos2_b1_int_coeff = 0,
-  parameter sos2_b2_int_coeff = -498645,
-  parameter sos2_a1_int_coeff = -16019050,
-  parameter sos2_a2_int_coeff = 7687568,
+  parameter sos2_b2_int_coeff = -1949056,
+  parameter sos2_a1_int_coeff = -16368696,
+  parameter sos2_a2_int_coeff = 7986060,
 
   // sos3 coeffs
-  parameter sos3_b0_int_coeff = 498645,
+  parameter sos3_b0_int_coeff = 1949056,
   parameter sos3_b1_int_coeff = 0,
-  parameter sos3_b2_int_coeff = -498645,
-  parameter sos3_a1_int_coeff = -15487989,
-  parameter sos3_a2_int_coeff = 7253728
+  parameter sos3_b2_int_coeff = -1949056,
+  parameter sos3_a1_int_coeff = -9542824,
+  parameter sos3_a2_int_coeff = 2899653
   )(
-  input clk_in,  // 125 MHz
+  input clk_in,  // 60 MHz
   input rst_n,
   input miso,
   input m_axis_tready,  // ready signal from upstream device
@@ -53,20 +53,8 @@ module ADC_to_iir_test_top #(
   wire [inout_width-1:0] w_iir_output_axis_tdata;
   wire w_spi_to_iir_axis_tvalid;
   wire w_iir_to_spi_axis_tready;
-  wire w_clk_50MHz;
 
   // module instantiations
-
-  clk_wiz_0 clk0
-   (
-    // Clock out ports
-    .clk_out1(w_clk_50MHz),     // output clk_out1
-    // Status and control signals
-    .resetn(rst_n), // input resetn
-    .locked(locked),       // output locked
-   // Clock in ports
-    .clk_in1(clk_in)      // input clk_in1
-  );
 
   MCP3202_SPI_S_AXIS #(
     .FCLK(FCLK),
@@ -74,7 +62,7 @@ module ADC_to_iir_test_top #(
     .SGL(SGL),  
     .ODD(ODD)
   ) spi0 (
-    .clk(w_clk_50MHz),
+    .clk(clk_in),
     .rst_n(rst_n),
     .miso(miso),
     .s_axis_spi_tready(w_iir_to_spi_axis_tready),
@@ -85,7 +73,7 @@ module ADC_to_iir_test_top #(
     .s_axis_spi_tvalid(w_spi_to_iir_axis_tvalid)
   );
 
-  iir_4th_order_bandpass_axis #(
+  iir_bandpass_noise_offset_removal_axis #(
     .coeff_width(coeff_width),
     .inout_width(inout_width),
     .scale_factor(scale_factor),
@@ -114,7 +102,7 @@ module ADC_to_iir_test_top #(
     .sos3_a1_int_coeff(sos3_a1_int_coeff),
     .sos3_a2_int_coeff(sos3_a2_int_coeff)
   ) iir0 (
-    .clk(w_clk_50MHz),
+    .clk(clk_in),
     .rst_n(rst_n),
     .s_axis_tvalid(w_spi_to_iir_axis_tvalid),
     .s_axis_tdata(w_spi_to_iir_axis_tdata),
