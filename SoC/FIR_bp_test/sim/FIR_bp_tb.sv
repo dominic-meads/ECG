@@ -13,127 +13,13 @@ module Bandpass_impulse_response_tb;
   // 50 MHz clock
   always #10 clk = ~clk; 
 
-  // constants for module instantiation
-  localparam coeff_width  = 25;
-  localparam inout_width  = 16;
-  localparam scale_factor = 23;
-
-  localparam b0_coeff = 0;
-  localparam b1_coeff = 3488;
-  localparam b2_coeff = 4584;
-  localparam b3_coeff = 1657;
-  localparam b4_coeff = -7004;
-  localparam b5_coeff = -21544;
-  localparam b6_coeff = -38844;
-  localparam b7_coeff = -52147;
-  localparam b8_coeff = -52988;
-  localparam b9_coeff = -35280;
-  localparam b10_coeff = 0;
-  localparam b11_coeff = 41968;
-  localparam b12_coeff = 71124;
-  localparam b13_coeff = 65590;
-  localparam b14_coeff = 10873;
-  localparam b15_coeff = -90396;
-  localparam b16_coeff = -213161;
-  localparam b17_coeff = -312565;
-  localparam b18_coeff = -335311;
-  localparam b19_coeff = -237025;
-  localparam b20_coeff = 0;
-  localparam b21_coeff = 355329;
-  localparam b22_coeff = 770299;
-  localparam b23_coeff = 1160719;
-  localparam b24_coeff = 1439189;
-  localparam b25_coeff = 1540115;
-  localparam b26_coeff = 1439189;
-  localparam b27_coeff = 1160719;
-  localparam b28_coeff = 770299;
-  localparam b29_coeff = 355329;
-  localparam b30_coeff = 0;
-  localparam b31_coeff = -237025;
-  localparam b32_coeff = -335311;
-  localparam b33_coeff = -312565;
-  localparam b34_coeff = -213161;
-  localparam b35_coeff = -90396;
-  localparam b36_coeff = 10873;
-  localparam b37_coeff = 65590;
-  localparam b38_coeff = 71124;
-  localparam b39_coeff = 41968;
-  localparam b40_coeff = 0;
-  localparam b41_coeff = -35280;
-  localparam b42_coeff = -52988;
-  localparam b43_coeff = -52147;
-  localparam b44_coeff = -38844;
-  localparam b45_coeff = -21544;
-  localparam b46_coeff = -7004;
-  localparam b47_coeff = 1657;
-  localparam b48_coeff = 4584;
-  localparam b49_coeff = 3488;
-  localparam b50_coeff = 0;
-
-  FIR_bp #(
-    .coeff_width(25),
-    .inout_width(16),
-    .scale_factor(23),
-    .b0_coeff(b0_coeff),
-    .b1_coeff(b1_coeff),
-    .b2_coeff(b2_coeff),
-    .b3_coeff(b3_coeff),
-    .b4_coeff(b4_coeff),
-    .b5_coeff(b5_coeff),
-    .b6_coeff(b6_coeff),
-    .b7_coeff(b7_coeff),
-    .b8_coeff(b8_coeff),
-    .b9_coeff(b9_coeff),
-    .b10_coeff(b10_coeff),
-    .b11_coeff(b11_coeff),
-    .b12_coeff(b12_coeff),
-    .b13_coeff(b13_coeff),
-    .b14_coeff(b14_coeff),
-    .b15_coeff(b15_coeff),
-    .b16_coeff(b16_coeff),
-    .b17_coeff(b17_coeff),
-    .b18_coeff(b18_coeff),
-    .b19_coeff(b19_coeff),
-    .b20_coeff(b20_coeff),
-    .b21_coeff(b21_coeff),
-    .b22_coeff(b22_coeff),
-    .b23_coeff(b23_coeff),
-    .b24_coeff(b24_coeff),
-    .b25_coeff(b25_coeff),
-    .b26_coeff(b26_coeff),
-    .b27_coeff(b27_coeff),
-    .b28_coeff(b28_coeff),
-    .b29_coeff(b29_coeff),
-    .b30_coeff(b30_coeff),
-    .b31_coeff(b31_coeff),
-    .b32_coeff(b32_coeff),
-    .b33_coeff(b33_coeff),
-    .b34_coeff(b34_coeff),
-    .b35_coeff(b35_coeff),
-    .b36_coeff(b36_coeff),
-    .b37_coeff(b37_coeff),
-    .b38_coeff(b38_coeff),
-    .b39_coeff(b39_coeff),
-    .b40_coeff(b40_coeff),
-    .b41_coeff(b41_coeff),
-    .b42_coeff(b42_coeff),
-    .b43_coeff(b43_coeff),
-    .b44_coeff(b44_coeff),
-    .b45_coeff(b45_coeff),
-    .b46_coeff(b46_coeff),
-    .b47_coeff(b47_coeff),
-    .b48_coeff(b48_coeff),
-    .b49_coeff(b49_coeff),
-    .b50_coeff(b50_coeff)
-  ) uut (
-    .clk(clk),
-    .rst_n(rst_n),
-    .s_axis_tvalid(s_axis_tvalid),
-    .s_axis_tdata(s_axis_tdata),
-    .m_axis_tready(m_axis_tready),
-    .m_axis_tdata(m_axis_tdata),
-    .m_axis_tvalid(m_axis_tvalid),
-    .s_axis_tready(s_axis_tready)
+  AXIS_FIR_bp uut (
+    .clk(clk),                      // input wire aclk
+    .s_axis_tvalid(s_axis_tvalid),  // input wire s_axis_data_tvalid
+    .s_axis_tready(s_axis_tready),  // output wire s_axis_data_tready
+    .s_axis_tdata(s_axis_tdata),    // input wire [15 : 0] s_axis_data_tdata
+    .m_axis_tvalid(m_axis_tvalid),  // output wire m_axis_data_tvalid
+    .m_axis_tdata(m_axis_tdata)     // output wire [15 : 0] m_axis_data_tdata
   );
 
   // variables for tb stimulus
@@ -156,7 +42,7 @@ module Bandpass_impulse_response_tb;
   task axis_impulse();
     begin
       checking_impulse_resp = 1'b1;
-      i_impulse_max = 2**(inout_width-1)-1; // 2^(inout_width-1) because input is signed, so to make max positive number need MSB-1 (sign bit stays 0)
+      i_impulse_max = 2**(15)-1;            // 2^(inout_width-1) because input is signed, so to make max positive number need MSB-1 (sign bit stays 0)
       wait (rst_n == 1'b1)                  // wait for reset release
       wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge clk
 
@@ -168,16 +54,16 @@ module Bandpass_impulse_response_tb;
           s_axis_tvalid = 1'b0;
         end
 
-      #1999980  // fs = 500 Hz
+      #1980  
       wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge clk 
       s_axis_tdata = 0;                     // data goes back to 0
       s_axis_tvalid = 1'b1;
       #20
       s_axis_tvalid = 1'b0;
 
-      repeat(500)  // repeat for 500 samples @ fs =  500 Hz
+      repeat(70)  
         begin
-          #1999980  // fs = 500 Hz
+          #1980  
           wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge clk
           s_axis_tvalid = 1'b1;                 // valid flag every clock cycle
           #20
@@ -213,7 +99,7 @@ module Bandpass_impulse_response_tb;
     rst_n = 1'b1;
     #40
     axis_impulse();
-    #10000
+    #1000
     rst_n = 1'b0;  // reset to test an input signal
     checking_wave_output = 1'b1;
 
@@ -222,9 +108,7 @@ module Bandpass_impulse_response_tb;
     for (i = 0; i < num_samples; i = i + 1)
       begin
         status = $fscanf(fid,"%d\n",sample); 
-        //$display("%d\n",sample);
         r_wave_sample[i] = 16'(sample);
-        //$display("%d index is %d\n",i,r_wave_sample[i]);
       end
     $fclose(fid);
     
@@ -233,7 +117,7 @@ module Bandpass_impulse_response_tb;
     
     repeat(num_samples)  // 500 Hz sampling
       begin 
-        #1999980
+        #1980
         s_axis_tdata = r_wave_sample[j];
         j = j + 1;
         wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge of clock

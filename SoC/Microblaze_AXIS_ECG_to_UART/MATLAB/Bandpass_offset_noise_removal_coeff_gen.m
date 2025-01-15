@@ -11,104 +11,21 @@ clc
 
 fs = 500;
 
-%% SOS and G generation using filterDesigner tool
-% Response Type = Bandpass
-% Design Method = IIR (elliptical)
-% Filter Order =  16
-% Fstop1 = 1;    % First Stopband Frequency
-% Fpass1 = 2;    % First Passband Frequency
-% Fpass2 = 48;   % Second Passband Frequency
-% Fstop2 = 92;   % Second Stopband Frequency
-% Astop1 = 40;   % First Stopband Attenuation (dB)
-% Apass  = 1;    % Passband Ripple (dB)
-% Astop2 = 40;   % Second Stopband Attenuation (dB)
-% Fs     = 500;  % Sampling Frequency
+%% Pre-conditioning Bandpass filter design
+% noise and offset removal
+fcL = 2;
+fcH = 48;
+WcL = fcL/(fs/2);
+WcH = fcH/(fs/2);
 
-% get filter object with exported code
-Hd = getFilter;
+b = fir1(50,[WcL WcH]);
+figure('Color', [1,1,1]);
+freqz(b,1,2^10,fs);
 
-
-%% scale the filter coefficients for conversion to integer
-
-% scale 
-sos_scaled = (2^23)*Hd.SOSMatrix;
-
-%% Check stability and frequency response of each section individually
-for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
-    B_fixed = sos_scaled(i,1:3);
-    A_fixed = sos_scaled(i,4:6);
-    disp(['Section ', num2str(i), ' is stable?']);
-    fixed_filter_stable = isstable(B_fixed,A_fixed)
-    figure;
-    zplane(B_fixed,A_fixed);
-    title(['Section ', num2str(i), ' fixed-point zplane']);
-end 
-
-for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
-    B_fixed = sos_scaled(i,1:3);
-    A_fixed = sos_scaled(i,4:6);
-    figure;
-    freqz(B_fixed,A_fixed,2^10,fs);
-    title(['Section ', num2str(i), ' fixed-point freqz']);
-end 
-
-%% embed induvidual gains in numerator coeffs
-g = Hd.ScaleValues;
-
-sos_with_g = sos_scaled; 
-sos_with_g(1,:) = [g(1)*sos_scaled(1,1:3), sos_scaled(1,4:6)];
-sos_with_g(2,:) = [g(2)*sos_scaled(2,1:3), sos_scaled(2,4:6)];
-sos_with_g(3,:) = [g(3)*sos_scaled(3,1:3), sos_scaled(3,4:6)];
-sos_with_g(4,:) = [g(4)*sos_scaled(4,1:3), sos_scaled(4,4:6)];
-sos_with_g(5,:) = [g(5)*sos_scaled(5,1:3), sos_scaled(5,4:6)];
-sos_with_g(6,:) = [g(6)*sos_scaled(6,1:3), sos_scaled(6,4:6)];
-sos_with_g(7,:) = [g(7)*sos_scaled(7,1:3), sos_scaled(7,4:6)];
-sos_with_g(8,:) = [g(8)*sos_scaled(8,1:3), sos_scaled(8,4:6)];
-
-% round to integer coefficients
-sos_fixed = fix(sos_with_g)
-
-%% Check stability and frequency response of each section individually
-for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
-    B_fixed = sos_fixed(i,1:3);
-    A_fixed = sos_fixed(i,4:6);
-    disp(['Section ', num2str(i), ' is stable?']);
-    fixed_filter_stable = isstable(B_fixed,A_fixed)
-    figure;
-    zplane(B_fixed,A_fixed);
-    title(['Section ', num2str(i), ' fixed-point zplane']);
-end 
-
-for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
-    B_fixed = sos_fixed(i,1:3);
-    A_fixed = sos_fixed(i,4:6);
-    figure;
-    freqz(B_fixed,A_fixed,2^10,fs);
-    title(['Section ', num2str(i), ' fixed-point freqz']);
-end 
-
-
-%% check frequency response and zplane of fixed-point coefficients
-
-[B_fixed,A_fixed] = sos2tf(sos_fixed);
-figure;
-zplane(B_fixed,A_fixed);
-title('fixed-point zplane');
-figure;
-freqz(B_fixed,A_fixed,2^10,fs);
-title('fixed-point freqz');
-
-
-%% print coefficients to file
-
-sos_table = table();
-sos_table.b0 = sos_fixed(:,1);
-sos_table.b1 = sos_fixed(:,2);
-sos_table.b2 = sos_fixed(:,3);
-sos_table.a1 = sos_fixed(:,5);  % omit a0 coefficient
-sos_table.a2 = sos_fixed(:,6);
-
-writetable(sos_table, "fixed_point_int_coeff_16th_order_bp.csv");
+%% scale the coefficients by scale_factor
+% max multipler 25 bits (signed), 1 bit for sign, one bit for 1s place, 23 bits for fractional
+scale_factor = 23; 
+b_scaled = fix(b*(2^scale_factor));
 
 %% Test filter with ECG data
 ECG_pcb_test_table = readtable('ECG_PCB_test.csv', 'VariableNamingRule', 'preserve');
@@ -121,7 +38,7 @@ title('Raw ECG signal vs noise filtered');
 xlabel('Sample');
 ylabel('ECG Amplitude (12-bit number)');
 hold on;
-ecg_filt = sosfilt(sos_fixed,ecg_pcb);
+ecg_filt = filtfilt(b_scaled,1,ecg_pcb);
 plot(ecg_filt);
 
 
