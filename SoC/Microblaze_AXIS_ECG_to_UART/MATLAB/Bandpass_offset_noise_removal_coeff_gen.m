@@ -1,7 +1,7 @@
 %% Generates fixed-point coefficients for biquads implemented in FPGA. 
 % See biquad code: https://github.com/dominic-meads/Vivado-Projects/blob/main/IIR_Direct_form_1_Biquad/iir_DF1_Biquad_AXIS.v
 %
-% Want to generate Bandpass filter with cuttoffs of 2 Hz and 48 Hz to
+% Want to generate Bandpass filter with cuttoffs of 2 Hz and 55 Hz to
 % remove DC offset (motion artifacts/baseline drift), and power line 60 Hz
 % noise
 
@@ -13,29 +13,33 @@ fs = 500;
 
 %% SOS and G generation using filterDesigner tool
 % Response Type = Bandpass
-% Design Method = IIR (Butterworth)
-% Filter Order = Specify order (8)
-% Fs = 500 Hz
-% Fc1 = 2 Hz
-% Fc2 = 48 Hz
-% Structure = Direct-Form I, Second-Order Sections
+% Design Method = IIR (elliptical)
+% Filter Order =  16
+% Fstop1 = 1;    % First Stopband Frequency
+% Fpass1 = 2;    % First Passband Frequency
+% Fpass2 = 48;   % Second Passband Frequency
+% Fstop2 = 92;   % Second Stopband Frequency
+% Astop1 = 40;   % First Stopband Attenuation (dB)
+% Apass  = 1;    % Passband Ripple (dB)
+% Astop2 = 40;   % Second Stopband Attenuation (dB)
+% Fs     = 500;  % Sampling Frequency
 
 % get filter object with exported code
-Hd = filterDesigner_bandpass_gen_code;
+Hd = getFilter;
+
 
 %% scale the filter coefficients for conversion to integer
 
 % scale 
-sos_scaled = (2^23)*Hd.sosMatrix;
+sos_scaled = (2^23)*Hd.SOSMatrix;
 
 %% Check stability and frequency response of each section individually
-figure;
 for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
     B_fixed = sos_scaled(i,1:3);
     A_fixed = sos_scaled(i,4:6);
     disp(['Section ', num2str(i), ' is stable?']);
     fixed_filter_stable = isstable(B_fixed,A_fixed)
-    subplot(2,2,i);
+    figure;
     zplane(B_fixed,A_fixed);
     title(['Section ', num2str(i), ' fixed-point zplane']);
 end 
@@ -43,11 +47,9 @@ end
 for i = 1:size(sos_scaled,1)  % iterate for each row in sos matrix
     B_fixed = sos_scaled(i,1:3);
     A_fixed = sos_scaled(i,4:6);
-    disp(['Section ', num2str(i), ' is stable?']);
-    fixed_filter_stable = isstable(B_fixed,A_fixed)
     figure;
     freqz(B_fixed,A_fixed,2^10,fs);
-    title(['Section ', num2str(i), ' fixed-point zplane']);
+    title(['Section ', num2str(i), ' fixed-point freqz']);
 end 
 
 %% embed induvidual gains in numerator coeffs
@@ -58,18 +60,21 @@ sos_with_g(1,:) = [g(1)*sos_scaled(1,1:3), sos_scaled(1,4:6)];
 sos_with_g(2,:) = [g(2)*sos_scaled(2,1:3), sos_scaled(2,4:6)];
 sos_with_g(3,:) = [g(3)*sos_scaled(3,1:3), sos_scaled(3,4:6)];
 sos_with_g(4,:) = [g(4)*sos_scaled(4,1:3), sos_scaled(4,4:6)];
+sos_with_g(5,:) = [g(5)*sos_scaled(5,1:3), sos_scaled(5,4:6)];
+sos_with_g(6,:) = [g(6)*sos_scaled(6,1:3), sos_scaled(6,4:6)];
+sos_with_g(7,:) = [g(7)*sos_scaled(7,1:3), sos_scaled(7,4:6)];
+sos_with_g(8,:) = [g(8)*sos_scaled(8,1:3), sos_scaled(8,4:6)];
 
 % round to integer coefficients
 sos_fixed = fix(sos_with_g)
 
 %% Check stability and frequency response of each section individually
-figure;
 for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
     B_fixed = sos_fixed(i,1:3);
     A_fixed = sos_fixed(i,4:6);
     disp(['Section ', num2str(i), ' is stable?']);
     fixed_filter_stable = isstable(B_fixed,A_fixed)
-    subplot(2,2,i);
+    figure;
     zplane(B_fixed,A_fixed);
     title(['Section ', num2str(i), ' fixed-point zplane']);
 end 
@@ -77,11 +82,9 @@ end
 for i = 1:size(sos_fixed,1)  % iterate for each row in sos matrix
     B_fixed = sos_fixed(i,1:3);
     A_fixed = sos_fixed(i,4:6);
-    disp(['Section ', num2str(i), ' is stable?']);
-    fixed_filter_stable = isstable(B_fixed,A_fixed)
     figure;
     freqz(B_fixed,A_fixed,2^10,fs);
-    title(['Section ', num2str(i), ' fixed-point zplane']);
+    title(['Section ', num2str(i), ' fixed-point freqz']);
 end 
 
 
@@ -91,6 +94,10 @@ end
 figure;
 zplane(B_fixed,A_fixed);
 title('fixed-point zplane');
+figure;
+freqz(B_fixed,A_fixed,2^10,fs);
+title('fixed-point freqz');
+
 
 %% print coefficients to file
 
@@ -101,7 +108,22 @@ sos_table.b2 = sos_fixed(:,3);
 sos_table.a1 = sos_fixed(:,5);  % omit a0 coefficient
 sos_table.a2 = sos_fixed(:,6);
 
-writetable(sos_table, "fixed_point_int_coeff_4th_order_bp.csv");
+writetable(sos_table, "fixed_point_int_coeff_16th_order_bp.csv");
+
+%% Test filter with ECG data
+ECG_pcb_test_table = readtable('ECG_PCB_test.csv', 'VariableNamingRule', 'preserve');
+[rows,cols] = size(ECG_pcb_test_table);
+ecg_pcb = ECG_pcb_test_table.Data;
+x = 1:length(ecg_pcb);
+figure('Color',[1,1,1]);
+plot(x,ecg_pcb);
+title('Raw ECG signal vs noise filtered');
+xlabel('Sample');
+ylabel('ECG Amplitude (12-bit number)');
+hold on;
+ecg_filt = sosfilt(sos_fixed,ecg_pcb);
+plot(ecg_filt);
+
 
 %% Generate waveform samples to test in Vivado simulation
 

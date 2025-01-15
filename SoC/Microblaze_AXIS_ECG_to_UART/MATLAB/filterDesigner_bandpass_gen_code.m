@@ -10,9 +10,9 @@ function Hd = filterDesigner_bandpass_gen_code
 % All frequency values are in Hz.
 Fs = 500;  % Sampling Frequency
 
-N   = 8;   % Order
+N   = 12;   % Order
 Fc1 = 2;   % First Cutoff Frequency
-Fc2 = 48;  % Second Cutoff Frequency
+Fc2 = 45;  % Second Cutoff Frequency
 
 % Construct an FDESIGN object and call its BUTTER method.
 h  = fdesign.bandpass('N,F3dB1,F3dB2', N, Fc1, Fc2, Fs);
