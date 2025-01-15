@@ -79,19 +79,23 @@ fcH = 48;
 WcL = fcL/(fs/2);
 WcH = fcH/(fs/2);
 
-[b_rem, a_rem] = butter(6,[WcL, WcH]); 
+b_rem_fir = fir1(40,[WcL WcH]);
+figure('Color', [1,1,1]);
+freqz(b_rem_fir,1,2^10,fs);
 
+
+[b_rem_iir, a_rem_iir] = butter(6,[WcL WcH]);
 figure('Color', [1,1,1]);
-zplane(b_rem,a_rem);
+zplane(b_rem_iir,a_rem_iir);
 figure('Color', [1,1,1]);
-freqz(b_rem,a_rem,2^10,fs);
+freqz(b_rem_iir,a_rem_iir,2^10,fs);
 
 %% Pre-conditioning Bandpass filter application
 
 % concat all data into one big ecg
 ecg_test = [ecg_clean; ecg_noisy; ecg_bd; ecg_fast; ecg_pcb];
 
-ecg_noise_offset_removal = filtfilt(b_rem,a_rem,ecg_test);
+ecg_noise_offset_removal = filtfilt(b_rem_iir,a_rem_iir,ecg_test);
 
 t = (0:length(ecg_noise_offset_removal)-1)/fs;
 figure('Color',[1,1,1]);
@@ -101,6 +105,19 @@ plot(t,ecg_noise_offset_removal,"Color",[1 0.3 0.3]);
 ylabel("Amplitude");
 xlabel("Time (s)");
 legend({'ECG Raw','Offset and noise removed'});
+title("IIR FILTERED");
+
+ecg_noise_offset_removal_FIR = filtfilt(b_rem_fir,1,ecg_test);
+
+t = (0:length(ecg_noise_offset_removal_FIR)-1)/fs;
+figure('Color',[1,1,1]);
+plot(t,ecg_test,"Color",[0.6 0.87 1]);
+hold on;
+plot(t,ecg_noise_offset_removal_FIR,"Color",[1 0.3 0.3]);
+ylabel("Amplitude");
+xlabel("Time (s)");
+legend({'ECG Raw','Offset and noise removed'});
+title("FIR FILTERED");
 %% Bandpass filter design
 fcL = 5;
 fcH = 15;
