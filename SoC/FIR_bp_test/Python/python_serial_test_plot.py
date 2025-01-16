@@ -23,7 +23,7 @@ def animate_entire_graph(i):  # plots the entire graph and animates it
     v -= v_common_mode         # remove common mode offset
     v /= gain                  # remove gain of opamp stage in front-end
 
-    # convert sample number to time
+    # convert sample number to time1
     fs = 500  # sampling frequency
     Ts = 1/fs # sampling period
     t = x*Ts  # actual time

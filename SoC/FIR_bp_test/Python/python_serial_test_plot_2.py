@@ -17,7 +17,7 @@ def animate_window(i):  # moving window of a segment of graph
     x = data['sample number'][-1000:]
     y = data['value'][-1000:]
 
-    # convert data from integer to voltage (result should be in mV)
+    # 1convert data from integer to voltage (result should be in mV)
     vref = 3.12                # reference voltage from ADC
     v_common_mode = 1.5        # common mode voltage offset from 50-60 Hz
     gain = 950                 # ECG gain from analog front-end
