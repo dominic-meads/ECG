@@ -4,7 +4,7 @@ import os
 
 os.chdir('C:/Users/demea/ECG/SoC/FIR_bp_test/Python')
 
-ser = serial.Serial(port='COM10',baudrate=115200) #fpga shows as com10
+ser = serial.Serial(port='COM10',baudrate=115200) #fpga shows as com10 p
 sample_number = 0
 
 fieldnames = ["value", "sample number"]
