@@ -2,7 +2,7 @@
 
 module AXIS_square (
   input clk,
-  input rst,
+  input rst_n,
   input s_axis_tvalid,
   input signed [15:0] s_axis_tdata,
   input m_axis_tready,
@@ -16,15 +16,15 @@ module AXIS_square (
 
   // output registers
   reg r_s_axis_tready = 1'b0;
-  reg r_m_axis_tvalid 1'b0;
+  reg r_m_axis_tvalid = 1'b0;
   reg signed [31:0] r_m_axis_tdata = 32'h00000000;
 
   // state machine parameters
-  localparam READY = 1'b1;
+  localparam READY = 1'b0;
   localparam OUTPUT = 1'b1;
 
   // state machine registers
-  reg r_current_state 1'b0;
+  reg r_current_state = 1'b0;
   reg r_next_state = 1'b1;
 
   // register input
@@ -83,4 +83,4 @@ module AXIS_square (
   assign s_axis_tready = r_s_axis_tready;
   assign m_axis_tdata = r_m_axis_tdata;
 
-endmodule;
+endmodule
