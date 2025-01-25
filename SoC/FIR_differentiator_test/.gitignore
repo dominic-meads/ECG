@@ -1,0 +1,31 @@
+# Ignore build output directory
+/build
+/export
+
+# Ignore object files and dependent files
+.o
+.d
+
+#Ignore logs folder and log files
+/logs
+.log
+
+#Ignore lock files
+.lock
+
+.bin
+.pdi
+.peers.ini
+.repo.yaml
+.vitisWorkspace.json
+
+.db
+.wpc
+.wdf
+
+/FIR_differentiator_test/FIR_differentiator_test.cache
+/FIR_differentiator_test/FIR_differentiator_test.hw
+/FIR_differentiator_test/FIR_differentiator_test.ip_user_files
+/FIR_differentiator_test/FIR_differentiator_test.sim/sim_1/behav/xsim
+
+FIR_differentiator_test.xpr
