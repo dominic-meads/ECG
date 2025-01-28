@@ -5,15 +5,15 @@ module AXIS_moving_average_tb;
   reg  rst_n;
   reg  s_axis_tvalid;
   reg  m_axis_tready; 
-  reg  signed [31:0] s_axis_tdata;
-  wire signed [31:0] m_axis_tdata;
+  reg  [31:0] s_axis_tdata;
+  wire [31:0] m_axis_tdata;
   wire m_axis_tvalid;
   wire s_axis_tready;
 
   // 50 MHz clock
   always #10 clk = ~clk; 
 
-  AXIS_moving_average_tb uut (
+  AXIS_moving_average uut (
     .clk(clk),                      // input wire aclk
     .s_axis_tvalid(s_axis_tvalid),  // input wire s_axis_data_tvalid
     .s_axis_tready(s_axis_tready),  // output wire s_axis_data_tready
