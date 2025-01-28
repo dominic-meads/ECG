@@ -40,6 +40,6 @@ module AXIS_moving_average (
     .m_axis_data_tdata(w_m_axis_tdata)     // output wire [55 : 0] m_axis_data_tdata
   );
   
-  assign m_axis_tdata = w_m_axis_tdata >>> 23;
+  assign m_axis_tdata = w_m_axis_tdata >>> 20;
 
 endmodule
