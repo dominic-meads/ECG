@@ -10,7 +10,7 @@
 // Target Devices: 7 Series
 // Tool Versions: Vivado 2024.1
 // Description: 
-//      74-point moving average filter generated with a FIR compiler (all taps have same coefficient = 1/74 multiplied by 2^15)
+//      74-point moving average filter generated with a FIR compiler (all taps have same coefficient) 
 //
 // Dependencies: 
 // 
@@ -29,7 +29,7 @@ module AXIS_moving_average (
   output s_axis_tready
   ); 
   
-  wire [55:0] w_m_axis_tdata;
+  wire signed [55:0] w_m_axis_tdata;
   
   fir_compiler_0 fir0 (
     .aclk(clk),                          // input wire aclk
@@ -40,6 +40,6 @@ module AXIS_moving_average (
     .m_axis_data_tdata(w_m_axis_tdata)     // output wire [55 : 0] m_axis_data_tdata
   );
   
-  assign m_axis_tdata = w_m_axis_tdata >>> 20;  // perform rounding after coefficient conversion
+  assign m_axis_tdata = w_m_axis_tdata >>> 23;
 
 endmodule
