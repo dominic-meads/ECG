@@ -32,18 +32,18 @@ module AXIS_moving_average_tb;
       #40
       rst_n = 1'b1; // release reset
       
-      // output a signal that alternates between the value 3 and 5 (average should be 4 after initial delay of 74 samples)
+      // output a signal that alternates between the value 45 and 55 (average should be 50 after initial delay of 74 samples)
       repeat(50)  // 500 Hz sampling
         begin 
           #1980
-          s_axis_tdata = 5;
+          s_axis_tdata = 45;
           wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge of clock
           s_axis_tvalid = 1'b1;
           #20
           s_axis_tvalid = 1'b0; // tvalid only high for 1 clock cycle
 
           #1980
-          s_axis_tdata = 3;
+          s_axis_tdata = 55;
           wait (clk == 1'b0) wait (clk == 1'b1) // wait for rising edge of clock
           s_axis_tvalid = 1'b1;
           #20
