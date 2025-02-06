@@ -279,13 +279,18 @@ xlabel("Time (s)");
 
 %% Intervals Inbetween each
 
-ppi = zeros(1,numel(ecg_ma_max));
+ppi = zeros(1,numel(ecg_diff_2_max));
 
-for k = 1:numel(ecg_ma_max)
+for k = 1:numel(ecg_diff_2_max)
     i_start = ecg_diff_2_max(k);  % interval start
 
     if k < numel(ecg_diff_2_max) 
         i_end = ecg_ma_max(k);  % interval end
+        i = 1;
+        while i_end <= i_start  % this while loop always makes sure the end interval is at a later time
+            i_end = ecg_ma_max(k+i);
+            i = i+1;
+        end 
     else
         i_end = numel(ecg_diff_2);  % if the interval end is greater than the length of signal, just use the end of signal
     end
@@ -309,7 +314,4 @@ h = plot(ppi/fs,ecg_noise_offset_removal(ppi),'s');
 set(h,'MarkerSize',7);
 set(h,'MarkerEdgeColor',[0.5,0.5,0.5]);
 set(h,'MarkerFaceColor','r');
-
-
-%% Display 
 
