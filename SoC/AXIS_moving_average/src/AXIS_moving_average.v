@@ -29,7 +29,7 @@ module AXIS_moving_average (
   output s_axis_tready
   ); 
   
-  wire signed [55:0] w_m_axis_tdata;
+  wire signed [51:0] w_m_axis_tdata;
   
   fir_compiler_0 fir0 (
     .aclk(clk),                          // input wire aclk
