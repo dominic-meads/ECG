@@ -1,4 +1,3 @@
-
 ################################################################
 # This is a generated script based on design: ECG_bd
 #
@@ -518,5 +517,18 @@ proc create_root_design { parentCell } {
 ##################################################################
 
 create_root_design ""
+
+
+
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_0/s_axis]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_0/m_axis_0]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_0/m_axis_1]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_1/s_axis]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_1/m_axis_0]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_input_to_dual_o_1/m_axis_1]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_width_16_to_32_0/s_axis]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /axis_width_16_to_32_0/m_axis]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /AXIS_left_shift_mult_0/s_axis]
+set_property CONFIG.FREQ_HZ 12000000 [get_bd_intf_pins /AXIS_left_shift_mult_0/m_axis]
 
 
