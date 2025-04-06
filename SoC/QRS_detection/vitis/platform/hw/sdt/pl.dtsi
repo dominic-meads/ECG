@@ -5,14 +5,14 @@
 		clk_cpu_0: clk_cpu@0 {
 			compatible = "fixed-clock";
 			reg = <0>;
-			clock-frequency = <60000000>;
+			clock-frequency = <59992068>;
 			clock-output-names = "clk_cpu";
 			#clock-cells = <0>;
 		};
 		clk_bus_0: clk_bus_0@1 {
 			compatible = "fixed-clock";
 			reg = <1>;
-			clock-frequency = <60000000>;
+			clock-frequency = <59992068>;
 			clock-output-names = "clk_bus_0";
 			#clock-cells = <0>;
 		};
@@ -78,7 +78,7 @@
 				xlnx,d-lmb = <1>;
 				xlnx,sco = <0>;
 				xlnx,reset-msr-eip = <0>;
-				clock-frequency = <60000000>;
+				clock-frequency = <59992068>;
 				xlnx,debug-interface = <0>;
 				xlnx,use-ext-brk = <0>;
 				xlnx,daddr-size = <32>;
@@ -154,7 +154,7 @@
 				xlnx,enable-conversion = <0>;
 				xlnx,num-sync-ff-clk-irq = <1>;
 				xlnx,fsl-links = <3>;
-				timebase-frequency = <60000000>;
+				timebase-frequency = <59992068>;
 				xlnx,icache-force-tag-lutram = <0>;
 				xlnx,dcache-data-width = <0>;
 				xlnx,dcache-victims = <0>;
@@ -162,7 +162,7 @@
 				xlnx,debug-profile-size = <0>;
 				xlnx,unaligned-exceptions = <0>;
 				xlnx,lockstep-master = <0>;
-				xlnx,freq = <60000000>;
+				xlnx,freq = <59992068>;
 				xlnx,number-of-pc-brk = <1>;
 				xlnx,mmu-itlb-size = <2>;
 				xlnx,imprecise-exceptions = <0>;
@@ -173,9 +173,9 @@
 		};
 		axi_uartlite_0: axi_uartlite@40600000 {
 			compatible = "xlnx,axi-uartlite-2.0" , "xlnx,xps-uartlite-1.00.a";
-			clock-frequency = <60000000>;
+			clock-frequency = <59992068>;
 			xlnx,uartlite-board-interface = "usb_uart";
-			xlnx,s-axi-aclk-freq-hz-d = <60>;
+			xlnx,s-axi-aclk-freq-hz-d = <0x3936804>;
 			xlnx,rable = <0>;
 			xlnx,ip-name = "axi_uartlite";
 			reg = <0x40600000 0x10000>;
@@ -198,7 +198,7 @@
 			xlnx,ecc-onoff-reset-value = <1>;
 			xlnx,edk-special = "BRAM_CTRL";
 			xlnx,s-axi-ctrl-protocol = "AXI4LITE";
-			xlnx,mask = <0x00000000 0x00200000>;
+			xlnx,mask = <0x00000000 0x80200000>;
 			xlnx,mask1 = <0x00000000 0x00800000>;
 			xlnx,rable = <0>;
 			xlnx,mask2 = <0x00000000 0x00800000>;

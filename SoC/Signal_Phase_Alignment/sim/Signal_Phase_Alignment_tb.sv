@@ -7,6 +7,11 @@ One sample represents the period of a tvalid pulse.
 
 Therefore, in order to phase align, the FIR bandpass signal must be delayed by 350 samples, and the 
 moving averaged filter must be delayed by 43 samples. 
+
+run time 2.5 ms
+
+NOTE: WHEN EDITING SAMPLING FREQUENCY AND CLOCK TO SPEED UP SIMULATION, MAKE SURE TO CHANGE THE 
+      FREQUNECY PARAMETERS IN THE FIR COMPILER IP INSTANCES
 */
 
 `timescale 1ns/1ps
@@ -34,8 +39,8 @@ module Signal_Phase_Alignment_tb;
   localparam NUM_SAMPLES = 2000;
 
   // delay constants for phase alignment (in TVALID pulses)
-  localparam FIR_BANDPASS_TVALID_DELAY_CYCLES = 350;
-  localparam MOVING_AVERAGE_TVALID_DELAY_CYCLES = 43;
+  localparam FIR_BANDPASS_TVALID_DELAY_CYCLES = 113;  // 113 sample delay from FIR to 2nd Deriv
+  localparam MOVING_AVERAGE_TVALID_DELAY_CYCLES = 18; // 118 sample delay from MA to 2nd Deriv
   int j = 0;
   int k = 0;
 
@@ -92,7 +97,7 @@ module Signal_Phase_Alignment_tb;
       s_axis_0_tvalid = 1'b1;                     // tvalid high
       wait (sys_clock == 0) wait (sys_clock == 1) // wait for rising edge
       s_axis_0_tvalid = 1'b0;                     // tvalid low (only high for one clock cycle)
-      #t_sample_period;                           // wait for sample period before repeating
+      #(t_sample_period-83.333);                  // wait for sample period (minus one clock cycle) before repeating
     end
   end 
   endtask;
@@ -106,8 +111,14 @@ module Signal_Phase_Alignment_tb;
     begin
       #t_sample_period
       if (j == FIR_BANDPASS_TVALID_DELAY_CYCLES-1) 
-      begin 
-        M_AXIS_0_tready = 1'b1;
+      begin
+        repeat(NUM_SAMPLES)  // repeatedly assert tready 
+        begin
+          M_AXIS_0_tready = 1'b1; // (high for 1 clock cycle)
+          #83.333;
+          M_AXIS_0_tready = 1'b0; // low for the rest of the sampling period
+          #(t_sample_period-83.333);
+        end 
       end 
     end 
   end 
@@ -121,15 +132,29 @@ module Signal_Phase_Alignment_tb;
 
     // task for delay/alignment of moving averaged signal
   task phase_align_moving_average();
-  begin 
+  begin
+    wait (reset_n == 1'b1); 
+    for(k = 0; k < MOVING_AVERAGE_TVALID_DELAY_CYCLES; k = k+1)
+    begin
+      #t_sample_period
+      if (k == MOVING_AVERAGE_TVALID_DELAY_CYCLES-1) 
+      begin
+        repeat(NUM_SAMPLES)  // repeatedly assert tready 
+        begin
+          M_AXIS_1_tready = 1'b1; // (high for 1 clock cycle)
+          #83.333;
+          M_AXIS_1_tready = 1'b0; // low for the rest of the sampling period
+          #(t_sample_period-83.333);
+        end 
+      end 
+    end 
   end 
   endtask;
 
   // initial block for delay/alignment of moving averaged signal
   initial 
     begin
-       
-
+       phase_align_moving_average();
     end
 
   // main initial block

@@ -259,6 +259,9 @@ DEVICE_ID:STRING=7s25
 //The directory containing a CMake configuration file for INTC.
 INTC_DIR:PATH=INTC_DIR-NOTFOUND
 
+//Number of slrs
+NUMBER_OF_SLRS:STRING=0x1
+
 //The directory containing a CMake configuration file for SCUGIC.
 SCUGIC_DIR:PATH=SCUGIC_DIR-NOTFOUND
 
