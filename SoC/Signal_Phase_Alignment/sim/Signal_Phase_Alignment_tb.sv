@@ -1,12 +1,11 @@
 /*
-After premilinary testing, the 75-point moving averaged filter is 307 samples behind the FIR BP, and
-the smoothed 2nd Derivative is 43 samples behind the moving averaged filter (or 350 samples behind 
-the FIR BP). 
+After premilinary testing, the 75-point moving averaged filter is 95 samples behind the FIR BP, and
+the smoothed 2nd Derivative is 18 samples behind the moving averaged filter.
 
 One sample represents the period of a tvalid pulse. 
 
-Therefore, in order to phase align, the FIR bandpass signal must be delayed by 350 samples, and the 
-moving averaged filter must be delayed by 43 samples. 
+Therefore, in order to phase align, the FIR bandpass signal must be delayed by 113 samples, and the 
+moving averaged filter must be delayed by 18 samples. 
 
 run time 2.5 ms
 
@@ -40,7 +39,7 @@ module Signal_Phase_Alignment_tb;
 
   // delay constants for phase alignment (in TVALID pulses)
   localparam FIR_BANDPASS_TVALID_DELAY_CYCLES = 113;  // 113 sample delay from FIR to 2nd Deriv
-  localparam MOVING_AVERAGE_TVALID_DELAY_CYCLES = 18; // 118 sample delay from MA to 2nd Deriv
+  localparam MOVING_AVERAGE_TVALID_DELAY_CYCLES = 18; // 18 sample delay from MA to 2nd Deriv
   int j = 0;
   int k = 0;
 
