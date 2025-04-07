@@ -27,16 +27,16 @@ ylim([-1000,3000]);
 ylabel("Amplitude");
 legend("FIR_BP", "Moving Average", "Smoothed 2nd Deriv", "Peak Location");
 
-%%
-% find maximums of 2nd derivative signal
+%% find maximums of 2nd derivative signal
 p = deriv;  % rename for easier reading in the "find()" function
 L = length(deriv);
 ecg_diff_2_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1; 
 
-% threshold (reject maximums that are less than a threshold)
-diff_2_threshold = 300; 
-indicies_to_remove = find(ecg_diff_2_smooth(ecg_diff_2_max) < diff_2_threshold);
-ecg_diff_2_max(indicies_to_remove) = [];  % remove maximums less than threshold
+%% find maximums of moving-averaged signal
+p = moving_avg;
+L = length(moving_avg);
+ecg_ma_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;
+
 
 
 
