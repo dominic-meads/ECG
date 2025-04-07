@@ -18,7 +18,6 @@ Dominic Meads
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "platform.h"
 #include "xil_printf.h"
 #include "mb_interface.h"
@@ -27,20 +26,25 @@ Dominic Meads
 #define DERIV_TO_MA_DELAY_CYCLES 18
 #define MA_TO_FIR_DELAY_CYCLES   95
 #define DERIV_THRESHOLD_VALUE    300
+#define FIR_BP_THRESHOLD_VALUE   1750
 
 // function to determine if max has occured
 int max_has_occurred(int past_2_sample, int past_sample, int current_sample)
 {
     int status = 0;
 
-    // if the peak is at "past_sample", then both "past_2_sample" and "current_sample" will be less
-    if(past_2_sample < past_sample && past_sample > current_sample)
+    // make sure the peak is in the positive portion of signal
+    if(past_2_sample > 0 && past_sample > 0 && current_sample > 0)
     {
-        status = 1;  // max has occurred
-    }
-    else
-    {
-        status = 0;
+        // if the peak is at "past_sample", then both "past_2_sample" and "current_sample" will be less
+        if(past_2_sample < past_sample && past_sample > current_sample)
+        {
+            status = 1;  // max has occurred
+        }
+        else
+        {
+            status = 0;
+        }
     }
     
     return status;
@@ -94,19 +98,6 @@ int main()
         getfsl(current_ch1_sample, 1); 
         getfsl(current_ch2_sample, 2);
 
-        // debug block (ECG peak ocurring with these conditions)
-        // past_2_ch0_sample  = 1592;  
-        // past_ch0_sample    = 1593;  
-        // current_ch0_sample = 1593;  
-
-        // past_2_ch1_sample  = 977;  
-        // past_ch1_sample    = 993;  
-        // current_ch1_sample = 1053;
-
-        // past_2_ch2_sample  = 566;  
-        // past_ch2_sample    = 567;  
-        // current_ch2_sample = 568;
-
         // start looking for max of 2nd derivative (ch2)
         if (max_has_occurred(past_2_ch2_sample, past_ch2_sample, current_ch2_sample) == 1) 
         {
@@ -129,13 +120,9 @@ int main()
                     getfsl(current_ch0_sample, 0);
                     getfsl(current_ch1_sample, 1); 
                     getfsl(current_ch2_sample, 2); 
-                    
-                    //DEBUG BLOCK TO INJECT NEXT SAMPLES
-                    // current_ch0_sample = 1593;
-                    // current_ch1_sample = 1098;
-                    // current_ch2_sample = 561;
 
-                    if(max_has_occurred(past_2_ch0_sample, past_ch0_sample, current_ch0_sample) == 1)
+                    // detect max above specified threshold
+                    if(max_has_occurred(past_2_ch0_sample, past_ch0_sample, current_ch0_sample) == 1 && past_ch0_sample > FIR_BP_THRESHOLD_VALUE)
                     {
                         xil_printf("%d,%d,%d, 1\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 1 to show peak occurs here
                     }
