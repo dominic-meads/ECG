@@ -23,7 +23,7 @@ try:
       # get data from UART 
       raw_serial_byte = ser.readline() # gets data in byte literal
       value_byte_literal = raw_serial_byte.replace(b'\n', b'')  # remove newline
-      value_str = str(value_byte_literal,'UTF-8') # convert to string
+      value_str = str(value_byte_literal,'UTF-8') # convert to unicode string
       value_int = int(value_str) # convert to int
       print(value_int)
 
