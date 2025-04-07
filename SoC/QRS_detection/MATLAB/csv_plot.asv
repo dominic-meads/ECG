@@ -1,0 +1,31 @@
+close all
+clear all
+clc
+%% Script to read ECG csv file from python program and graph it. 
+
+cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
+
+ECG_table = readtable('ECG_data.csv', 'VariableNamingRule', 'preserve');
+FIR_bp = ECG_table.FIR_BP_sample;
+moving_avg = ECG_table.Moving_Averaged_sample; 
+deriv = ECG_table.Deriv_sample; 
+peaks = ECG_table.peak; 
+n = ECG_table.sample_number; 
+
+cd 'C:\Users\demea\ECG\SoC\QRS_detection\MATLAB'
+
+figure;
+plot(FIR_bp,n);
+hold on;
+plot(moving_avg,n);
+hold on;
+plot(deriv,n);
+hold on;
+plot(peaks,n);
+xlabel("Sample #");
+ylabel("Amplitude");
+legend()
+
+
+
+

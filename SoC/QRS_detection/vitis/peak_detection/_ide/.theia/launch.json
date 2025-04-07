@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "tcf-debug",
+      "request": "launch",
+      "name": "peak_detection_app_hw_1",
+      "debugType": "baremetal-fpga",
+      "attachToRunningTargetOptions": {
+        "targetSetupMode": "standalone",
+        "executeScript": true,
+        "scriptPath": ""
+      },
+      "autoAttachProcessChildren": false,
+      "target": {
+        "targetConnectionId": "Local",
+        "peersIniPath": "../../../.wsdata/.peers.ini",
+        "context": "fpga"
+      },
+      "targetSetup": {
+        "resetSystem": true,
+        "programDevice": true,
+        "bitstreamFile": "${workspaceFolder}\\peak_detection\\_ide\\bitstream\\design_1_wrapper.bit",
+        "downloadElf": [
+          {
+            "core": "microblaze_0",
+            "resetProcessor": true,
+            "elfFile": "${workspaceFolder}\\peak_detection\\build\\peak_detection.elf",
+            "stopAtEntry": false
+          }
+        ]
+      },
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}

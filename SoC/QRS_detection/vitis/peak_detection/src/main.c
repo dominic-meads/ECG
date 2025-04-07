@@ -18,7 +18,6 @@ Dominic Meads
  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "platform.h"
 #include "xil_printf.h"
 #include "mb_interface.h"
@@ -50,6 +49,9 @@ int main()
 {
     init_platform();
     microblaze_disable_interrupts();
+
+    print("Hello World\n\r");
+    print("Successfully ran Hello World application");
 
     int past_2_ch0_sample  = 0;  // the oldest sample (delay of two)
     int past_ch0_sample    = 0;  // the previous sample
@@ -92,20 +94,7 @@ int main()
         // get current sample for all channels
         getfsl(current_ch0_sample, 0);
         getfsl(current_ch1_sample, 1); 
-        getfsl(current_ch2_sample, 2);
-
-        // debug block (ECG peak ocurring with these conditions)
-        // past_2_ch0_sample  = 1592;  
-        // past_ch0_sample    = 1593;  
-        // current_ch0_sample = 1593;  
-
-        // past_2_ch1_sample  = 977;  
-        // past_ch1_sample    = 993;  
-        // current_ch1_sample = 1053;
-
-        // past_2_ch2_sample  = 566;  
-        // past_ch2_sample    = 567;  
-        // current_ch2_sample = 568;
+        getfsl(current_ch2_sample, 2); 
 
         // start looking for max of 2nd derivative (ch2)
         if (max_has_occurred(past_2_ch2_sample, past_ch2_sample, current_ch2_sample) == 1) 
@@ -129,30 +118,25 @@ int main()
                     getfsl(current_ch0_sample, 0);
                     getfsl(current_ch1_sample, 1); 
                     getfsl(current_ch2_sample, 2); 
-                    
-                    //DEBUG BLOCK TO INJECT NEXT SAMPLES
-                    // current_ch0_sample = 1593;
-                    // current_ch1_sample = 1098;
-                    // current_ch2_sample = 561;
 
                     if(max_has_occurred(past_2_ch0_sample, past_ch0_sample, current_ch0_sample) == 1)
                     {
-                        xil_printf("%d,%d,%d, 1\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 1 to show peak occurs here
+                        xil_printf("%d, 1\n\r",current_ch0_sample);  // print a 1 to show peak occurs here
                     }
                     else
                     {
-                        xil_printf("%d,%d,%d, 0\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 0 to show no peak at current sample
+                        xil_printf("%d, 0\n\r",current_ch0_sample);  // print a 0 to show no peak at current sample
                     }
                 }
             }
             else
             {
-                xil_printf("%d,%d,%d, 0\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 0 to show no peak at current sample
+                xil_printf("%d, 0\n\r",current_ch0_sample);  // print a 0 to show no peak at current sample
             }
         }
         else 
         {
-            xil_printf("%d,%d,%d, 0\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 0 to show no peak at current sample
+            xil_printf("%d, 0\n\r",current_ch0_sample);  // print a 0 to show no peak at current sample
         }   
     }
 

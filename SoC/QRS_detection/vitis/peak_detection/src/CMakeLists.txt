@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.16)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/Hello_worldExample.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/UserConfig.cmake)
-set(APP_NAME AXI_Stream_read)
+set(APP_NAME peak_detection)
 project(${APP_NAME})
 
 enable_language(C ASM CXX)
@@ -23,13 +23,11 @@ collect(PROJECT_LIB_DEPS xilstandalone;xiltimer;gloss)
 
 
 
-
-
 collect(PROJECT_LIB_DEPS xil)
 collect(PROJECT_LIB_DEPS gcc)
 collect(PROJECT_LIB_DEPS c)
 
-collect (PROJECT_LIB_SOURCES AXI_Stream_read.c)
+collect (PROJECT_LIB_SOURCES main.c)
 collect (PROJECT_LIB_SOURCES platform.c)
 collector_list (_sources PROJECT_LIB_SOURCES)
 foreach (source ${_sources})
