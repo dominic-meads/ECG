@@ -37,6 +37,21 @@ p = moving_avg;
 L = length(moving_avg);
 ecg_ma_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;
 
+%% plot detected peaks
+
+% I have double detected peaks.
+% Go through peaks and reject doubles 
+
+double_peaks = find(peaks);
+QRS_peaks = double_peaks(1:2:end); % pick out every other element
+
+figure;
+plot(n,FIR_bp);
+hold on;
+h = plot(QRS_peaks,FIR_bp(QRS_peaks),'s','MarkerSize',10,...
+    'MarkerEdgeColor','red',...
+    'MarkerFaceColor',[1 .6 .6])
+
 
 
 
