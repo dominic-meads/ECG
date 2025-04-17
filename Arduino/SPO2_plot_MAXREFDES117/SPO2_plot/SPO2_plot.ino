@@ -14,6 +14,7 @@ https://forum.arduino.cc/t/making-sense-of-max30102/1323369
 // global variables
 uint8_t fifo_wr_ptr = 0; 
 uint8_t fifo_rd_ptr = 0;
+uint8_t fifo_ov_ptr = 0;
 
 uint8_t num_available_samples = 0;
 uint8_t num_samples_to_read = 0;
@@ -22,8 +23,12 @@ uint8_t num_samples_to_read = 0;
 // 1st index hold bits [17:16]
 // 2nd index holds [15:8]
 // 3rd index hold [7:0]
-uint8_t LED_red[3] = {};
-uint8_t LED_IR[3] = {};
+uint8_t LED_red_sample_byte[3] = {};
+uint8_t LED_IR_sample_byte[3] = {};
+
+// integers to hold entire sample
+int LED_IR_sample = 0;
+int LED_red_sample = 0;
 
 void setup()
 {
@@ -34,70 +39,16 @@ void setup()
   // test config function 
   MAX30102_config(50, 4, 200, 411, 4096);
 
-  // debug block to print out all values of the register map
-  uint8_t reg = 0;
-  uint8_t addr = 0;
-  for(int i = 0; i < 48; i++)
-  {
-    addr = i;
-    reg = read_reg(0x57, addr);
-    Serial.print("Register Address ");
-    Serial.print(addr, HEX);
-    Serial.print(" holds binary data 0b");
-    for (int i = 7; i >= 0; i--) {
-      Serial.print(bitRead(reg, i));
-    }
-    Serial.println();
-  }
-
-  // // print reg contents in binary
-  // Serial.print("fifo_config register contents are: ");
-  // for (int i = 7; i >= 0; i--) {
-  //     Serial.print(bitRead(fifo_config, i));
-  //   }
-  // Serial.println();
-
-
-  // DEBUG BLOCK to test sample reading
-  // get fifo_write_pointer
+  Serial.println("FIFO wr, rd, and overflow status after reset ");
   fifo_wr_ptr = read_reg(0x57, 0x04); // address of FIFO_WR_PTR;
   fifo_rd_ptr = read_reg(0x57, 0x06);
-  num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
-  num_samples_to_read = num_available_samples;
-
-  Serial.print("wr_pointer = ");
-  Serial.println(fifo_wr_ptr, DEC);
-
-  uint8_t fifo_ov_ptr = read_reg(0x57, 0x05);
-  Serial.print("fifo_ov_ptr = ");
-  Serial.println(fifo_ov_ptr, DEC);
-
-  Serial.print("rd_pointer = ");
-  Serial.println(fifo_rd_ptr, DEC);
-
-  Serial.print("num_available_samples = ");
-  Serial.println(num_available_samples, DEC);
-
-  Serial.print("num_samples_to_read = ");
-  Serial.println(num_samples_to_read, DEC);
-
-  Serial.println("reset FIFO");
-  fifo_wr_ptr = 0;
-  write_reg(0x57, 0x04, fifo_wr_ptr);
-  fifo_ov_ptr = 0;
-  write_reg(0x57, 0x05, fifo_ov_ptr);
-  fifo_rd_ptr = 0;
-  write_reg(0x57, 0x06, fifo_rd_ptr);
-
-  fifo_wr_ptr = read_reg(0x57, 0x04); // address of FIFO_WR_PTR;
-  fifo_rd_ptr = read_reg(0x57, 0x06);
-  num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
-  num_samples_to_read = num_available_samples;
-
-  Serial.print("wr_pointer = ");
-  Serial.println(fifo_wr_ptr, DEC);
-
   fifo_ov_ptr = read_reg(0x57, 0x05);
+  num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
+  num_samples_to_read = num_available_samples;
+
+  Serial.print("wr_pointer = ");
+  Serial.println(fifo_wr_ptr, DEC);
+
   Serial.print("fifo_ov_ptr = ");
   Serial.println(fifo_ov_ptr, DEC);
 
@@ -109,106 +60,7 @@ void setup()
 
   Serial.print("num_samples_to_read = ");
   Serial.println(num_samples_to_read, DEC);
-
-
-  // prototyping of read_data function
-  Serial.println("starting 1 sample");
-  Wire.beginTransmission(0x57);
-  Wire.write(0x07);             
-  Wire.endTransmission(false);  
-  Wire.requestFrom(0x57, 6);    
-  LED_red[0] = Wire.read();
-  LED_red[1] = Wire.read();
-  LED_red[2] = Wire.read();
-  LED_IR[0] = Wire.read();
-  LED_IR[1] = Wire.read();
-  LED_IR[2] = Wire.read();
-  Wire.endTransmission();
-
-  // print reg contents in binary
-  Serial.print("LED_red[0] =  ");
-  for (int i = 7; i >= 0; i--) {
-      Serial.print(bitRead(LED_red[0], i));
-    }
-  Serial.println();
-
-  // print reg contents in binary
-  Serial.print("LED_red[1] =  ");
-  for (int i = 7; i >= 0; i--) {
-      Serial.print(bitRead(LED_red[1], i));
-    }
-  Serial.println();
-
-  // print reg contents in binary
-  Serial.print("LED_red[2] =  ");
-  for (int i = 7; i >= 0; i--) {
-      Serial.print(bitRead(LED_red[2], i));
-    }
-  Serial.println();
-
-fifo_wr_ptr = read_reg(0x57, 0x04); // address of FIFO_WR_PTR;
-fifo_rd_ptr = read_reg(0x57, 0x06);
-num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
-num_samples_to_read = num_available_samples;
-
-Serial.print("wr_pointer = ");
-Serial.println(fifo_wr_ptr, DEC);
-
-fifo_ov_ptr = read_reg(0x57, 0x05);
-Serial.print("fifo_ov_ptr = ");
-Serial.println(fifo_ov_ptr, DEC);
-
-Serial.print("rd_pointer = ");
-Serial.println(fifo_rd_ptr, DEC);
-
-Serial.print("num_available_samples = ");
-Serial.println(num_available_samples, DEC);
-
-Serial.print("num_samples_to_read = ");
-Serial.println(num_samples_to_read, DEC);
-
-Serial.println("reset again after \"popping\" a sample to reset overflow");
-fifo_wr_ptr = 0;
-write_reg(0x57, 0x04, fifo_wr_ptr);
-fifo_rd_ptr = 0;
-write_reg(0x57, 0x06, fifo_rd_ptr);
-
-fifo_wr_ptr = read_reg(0x57, 0x04); // address of FIFO_WR_PTR;
-fifo_rd_ptr = read_reg(0x57, 0x06);
-num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
-num_samples_to_read = num_available_samples;
-
-Serial.print("wr_pointer = ");
-Serial.println(fifo_wr_ptr, DEC);
-
-fifo_ov_ptr = read_reg(0x57, 0x05);
-Serial.print("fifo_ov_ptr = ");
-Serial.println(fifo_ov_ptr, DEC);
-
-Serial.print("rd_pointer = ");
-Serial.println(fifo_rd_ptr, DEC);
-
-Serial.print("num_available_samples = ");
-Serial.println(num_available_samples, DEC);
-
-Serial.print("num_samples_to_read = ");
-Serial.println(num_samples_to_read, DEC);
-
-  reg = 0;
-  addr = 0;
-  for(int i = 0; i < 48; i++)
-  {
-    addr = i;
-    reg = read_reg(0x57, addr);
-    Serial.print("Register Address ");
-    Serial.print(addr, HEX);
-    Serial.print(" holds binary data 0b");
-    for (int i = 7; i >= 0; i--) {
-      Serial.print(bitRead(reg, i));
-    }
-    Serial.println();
-  }
-  
+    
 }
 
 void write_reg(uint8_t device_addr, uint8_t reg_addr, uint8_t data)
@@ -469,12 +321,12 @@ void reset_FIFO()
   Wire.write(0x07);             
   Wire.endTransmission(false);  
   Wire.requestFrom(0x57, 6);    
-  LED_red[0] = Wire.read();
-  LED_red[1] = Wire.read();
-  LED_red[2] = Wire.read();
-  LED_IR[0] = Wire.read();
-  LED_IR[1] = Wire.read();
-  LED_IR[2] = Wire.read();
+  LED_red_sample_byte[0] = Wire.read();
+  LED_red_sample_byte[1] = Wire.read();
+  LED_red_sample_byte[2] = Wire.read();
+  LED_IR_sample_byte[0] = Wire.read();
+  LED_IR_sample_byte[1] = Wire.read();
+  LED_IR_sample_byte[2] = Wire.read();
   Wire.endTransmission();
 
   // write all to 0 again after "popping" a signal
@@ -483,6 +335,60 @@ void reset_FIFO()
   write_reg(0x57, 0x06, fifo_rd_ptr);
 
   // at this point, the wr_pointer should be 0, rd_pointer should be 0, and overflow should be 0
+}
+
+// function to combine the bytes read from fifo data into a sample. 
+// just as the data sheet shows, byte 1 contains the MSBs, byte2 contains 
+// the middle portion of the sample, and byte3 contains the LSBs
+// byte1 contains bits [23:16] of sample. ONLY contains 2 bits of useable data [17:16]
+// byte2 contains bits [15:8] of sample
+// byte3 contains bit [7:0] of sample
+int combine_bytes_into_sample(uint8_t byte1, uint8_t byte2, uint8_t byte3)
+{
+  int result = 0;
+  
+  // clear unusable bits of byte_1
+  byte1 &= 0b00000011;
+  
+  // convert byte_1 and byte_2 to 16 bits
+  uint16_t temp_result = ((uint16_t)byte1 << 8) | byte2;
+
+  // combine all into integer
+  result = ((int)temp_result << 8) | byte3; 
+
+  return result;
+}
+
+void get_samples()
+{
+  fifo_wr_ptr = read_reg(0x57, 0x04); 
+  fifo_rd_ptr = read_reg(0x57, 0x06);
+
+  num_available_samples = fifo_wr_ptr-fifo_rd_ptr;
+
+  if (num_available_samples > 0)
+  {
+    Wire.beginTransmission(0x57);
+    Wire.write(0x07);             
+    Wire.endTransmission(false);  
+    Wire.requestFrom(0x57, num_available_samples*6);
+    
+    for(int i = 0; i < num_available_samples; i++)
+    {  
+      LED_red_sample_byte[0] = Wire.read();
+      LED_red_sample_byte[1] = Wire.read();
+      LED_red_sample_byte[2] = Wire.read();
+      LED_IR_sample_byte[0] = Wire.read();
+      LED_IR_sample_byte[1] = Wire.read();
+      LED_IR_sample_byte[2] = Wire.read();
+      LED_red_sample = combine_bytes_into_sample(LED_red_sample_byte[0], LED_red_sample_byte[1], LED_red_sample_byte[2]);
+      LED_IR_sample = combine_bytes_into_sample(LED_IR_sample_byte[0], LED_IR_sample_byte[1], LED_IR_sample_byte[2]);
+      Serial.println(LED_red_sample);
+      Serial.println(LED_IR_sample);
+    }
+  
+    Wire.endTransmission();
+  }
 }
 
 void MAX30102_config(uint8_t LED_brightness, int sample_avg, int sample_rate, int pulse_width, int ADC_range)
@@ -510,6 +416,7 @@ void MAX30102_config(uint8_t LED_brightness, int sample_avg, int sample_rate, in
 
 void loop()
 {
-
+  
+ get_samples();
 
 }
