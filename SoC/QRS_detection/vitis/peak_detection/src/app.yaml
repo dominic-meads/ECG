@@ -1,3 +1,0 @@
-domain_path: C:\Users\demea\ECG\SoC\QRS_detection\vitis\platform\export\platform\sw\standalone_microblaze_0
-app_src_dir: C:\Xilinx\Vitis\2024.1\data\embeddedsw\lib\sw_apps\hello_world
-template: hello_world
