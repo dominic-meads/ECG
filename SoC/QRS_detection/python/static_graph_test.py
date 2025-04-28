@@ -37,13 +37,12 @@ ind_arr_temp = np.array(ind)  # create an array
 # REMOVE DOUBLE DETECTED PEAKS (FIX IN SOFTWARE)
 temp = ind_arr_temp[::2]
 
-ind_arr = temp - window_samples  # since in the animate function we are looking at the past 1000 samples, subtract 1000 samples
+ind_arr = temp - window_samples  # since in the animate function we are looking at the past samples, subtract the amount of window samples
 last_index = int(y.index[-1]) # get the current last index in the csv file
 ind_arr += last_index # add the last index in the series to get the correct peak indexes
 
 # get real time bpm (averaged over time window)
 num_peaks = temp.size
-print(temp)
 p_to_p_samples_avg = 0
 for peak in range(num_peaks-1) :
   p_to_p_samples_avg += temp[peak+1] -  temp[peak]
@@ -61,7 +60,7 @@ plt.ylabel('ECG Amplitude (mV)')
 plt.title('ECG (Lead I)')
 plt.ylim(-2,2)
 plt.autoscale(enable=True, axis='x', tight=True) # make a tight x-axis
-plt.figtext(.7, .8, bpm_str, color = "#68F702", size=18, ha="center", va="center",
+plt.figtext(.8, .8, bpm_str, color = "#68F702", size=18, ha="center", va="center",
          bbox=dict(boxstyle="round",
                    ec=(0.5, 0.5, 0.5),
                    fc=(0.5, 0.5, 0.5),

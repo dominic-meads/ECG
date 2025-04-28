@@ -48,9 +48,18 @@ QRS_peaks = double_peaks(1:2:end); % pick out every other element
 figure;
 plot(n,FIR_bp);
 hold on;
+h = plot(double_peaks,FIR_bp(double_peaks),'s','MarkerSize',10,...
+    'MarkerEdgeColor','red',...
+    'MarkerFaceColor',[1 .6 .6]);
+title("Double Detected Peaks");
+
+figure;
+plot(n,FIR_bp);
+hold on;
 h = plot(QRS_peaks,FIR_bp(QRS_peaks),'s','MarkerSize',10,...
     'MarkerEdgeColor','red',...
-    'MarkerFaceColor',[1 .6 .6])
+    'MarkerFaceColor',[1 .6 .6]);
+title("Detected QRS Peaks");
 
 
 
