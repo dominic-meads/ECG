@@ -23,7 +23,7 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
-#define DERIV_TO_MA_DELAY_CYCLES 20
+#define DERIV_TO_MA_DELAY_CYCLES 18
 #define MA_TO_FIR_DELAY_CYCLES   96
 #define DERIV_THRESHOLD_VALUE    300
 #define FIR_BP_THRESHOLD_VALUE   1850
@@ -114,7 +114,7 @@ int main()
         // start looking for max of 2nd derivative (ch2)
         if (max_has_occurred(past_4_ch2_sample, past_2_ch2_sample, current_ch2_sample) == 1) 
         {
-            xil_printf("max of 2nd deriv occured----------\n\r");
+            //xil_printf("max of 2nd deriv occured----------\n\r");
             if (past_2_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
             {
                 // look for max of ECG/FIR BP (ch0) until max of moving average is found
@@ -149,14 +149,14 @@ int main()
                         // max_has_occured() function, there are essentially two maxes occuring next
                         // to each other. Maybe implement some sort of delay after the first one has occured?
                         // or a flag to ignore other maxes?
-                        xil_printf("ECG Max occurred ------\n\r");
+                        //xil_printf("ECG Max occurred ------\n\r");
                     }
                     else
                     {
                         xil_printf("%d,%d,%d, 0\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 0 to show no peak at current sample
                     }
                 }
-                xil_printf("MA max occured--------\n\r");
+                //xil_printf("MA max occured--------\n\r");
             }
             else
             {
