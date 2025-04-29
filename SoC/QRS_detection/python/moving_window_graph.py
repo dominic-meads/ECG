@@ -12,7 +12,7 @@ os.chdir('C:/Users/demea/ECG/SoC/QRS_detection/Python')
 
 plt.style.use('dark_background')
 
-time_window_sec = 3 # length in time of graph window
+time_window_sec = 5 # length in time of graph window
 fs = 500  # sampling frequency
 window_samples = time_window_sec * fs
 
@@ -48,7 +48,7 @@ def animate_window(i):  # moving window of a segment of graph
   num_peaks = temp.size
   p_to_p_samples_avg = 0
   for peak in range(num_peaks-1) :
-    p_to_p_samples_avg += temp[peak+1] -  temp[peak]
+    p_to_p_samples_avg += temp[peak+1] - temp[peak]
   
   if num_peaks > 1:  # make sure not to divide by zero
     p_to_p_samples_avg /= (num_peaks-1) # although there are num_peaks, there are num_peaks-1 sum operations in the loop above
