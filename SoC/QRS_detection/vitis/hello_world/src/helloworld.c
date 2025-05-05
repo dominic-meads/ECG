@@ -28,11 +28,11 @@ Dominic Meads
 #define DERIV_THRESHOLD_VALUE    300
 #define FIR_BP_THRESHOLD_VALUE   1850
 
-// function to determine if max has occured
+// function to determine if max has occured in a flatter signal
 // it takes the past 6 samples and the current sample to determine if there has been a max
 // a 7 sample window is used to detect peaks in non-impulsive signals such as the moving-average signal
 // "past_6_sample is the oldest of the 7 samples, "past_4_sample" is the 4th oldest
-int max_has_occurred(int past_6_sample, int past_3_sample, int current_sample)
+int flat_max_has_occurred(int past_6_sample, int past_3_sample, int current_sample)
 {
     int status = 0;
 
@@ -41,6 +41,33 @@ int max_has_occurred(int past_6_sample, int past_3_sample, int current_sample)
     {
         // if the peak is at "past_2_sample", then both "past_4_sample" and "current_sample" will be less
         if(past_6_sample < past_3_sample && past_3_sample > current_sample)
+        {
+            status = 1;  // max has occurred
+        }
+        else
+        {
+            status = 0;
+        }
+    }
+    
+    return status;
+}
+
+// function to determine if max has occured in impulsive signal such as qrs complex
+// in an impulsive signal, maximum will be more defined and peak of signal is less flat. 
+// Therefore, the window to look at the max of the signal can be less samples than in the
+// "flat_max_has_occured()" function. Having a shorter window decreases delay from 
+// actual peak to detected peak.
+// "past_4_sample is the oldest of the 5 samples, "past_2_sample" is the 2nd oldest
+int impulsive_max_has_occurred(int past_4_sample, int past_2_sample, int current_sample)
+{
+    int status = 0;
+
+    // make sure the peak is in the positive portion of signal
+    if(past_4_sample > 0 && past_2_sample > 0 && current_sample > 0)
+    {
+        // if the peak is at "past_2_sample", then both "past_4_sample" and "current_sample" will be less
+        if(past_4_sample < past_2_sample && past_2_sample > current_sample)
         {
             status = 1;  // max has occurred
         }
@@ -126,13 +153,13 @@ int main()
         getfsl(current_ch2_sample, 2);
 
         // start looking for max of 2nd derivative (ch2)
-        if (max_has_occurred(past_6_ch2_sample, past_3_ch2_sample, current_ch2_sample) == 1) 
+        if (flat_max_has_occurred(past_6_ch2_sample, past_3_ch2_sample, current_ch2_sample) == 1) 
         {
             //xil_printf("max of 2nd deriv occured----------\n\r");
             if (past_3_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
             {
                 // look for max of ECG/FIR BP (ch0) until max of moving average is found
-                while(max_has_occurred(past_6_ch1_sample, past_3_ch1_sample, current_ch1_sample) == 0) 
+                while(flat_max_has_occurred(past_6_ch1_sample, past_3_ch1_sample, current_ch1_sample) == 0) 
                 {
                     // update past samples
                     past_6_ch0_sample = past_5_ch0_sample; 
@@ -162,7 +189,8 @@ int main()
                     getfsl(current_ch2_sample, 2); 
 
                     // detect max above specified threshold
-                    if(max_has_occurred(past_6_ch0_sample, past_3_ch0_sample, current_ch0_sample) == 1 && past_3_ch0_sample > FIR_BP_THRESHOLD_VALUE)
+                    // look for max over smaller window(qrs complex more implusive than MA or 2nd deriv)
+                    if(impulsive_max_has_occurred(past_4_ch0_sample, past_2_ch0_sample, current_ch0_sample) == 1 && past_2_ch0_sample > FIR_BP_THRESHOLD_VALUE)
                     {
                         xil_printf("%d,%d,%d, 1\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 1 to show peak occurs here
                         // what I think is happening here is that because I am using 5 samples in my 
