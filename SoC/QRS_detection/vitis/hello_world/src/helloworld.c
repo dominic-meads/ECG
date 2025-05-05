@@ -29,16 +29,18 @@ Dominic Meads
 #define FIR_BP_THRESHOLD_VALUE   1850
 
 // function to determine if max has occured
-// "past_4_sample is the oldest of the 5 samples, "past_2_sample" is the 2nd oldest
-int max_has_occurred(int past_4_sample, int past_2_sample, int current_sample)
+// it takes the past 6 samples and the current sample to determine if there has been a max
+// a 7 sample window is used to detect peaks in non-impulsive signals such as the moving-average signal
+// "past_6_sample is the oldest of the 7 samples, "past_4_sample" is the 4th oldest
+int max_has_occurred(int past_6_sample, int past_3_sample, int current_sample)
 {
     int status = 0;
 
     // make sure the peak is in the positive portion of signal
-    if(past_4_sample > 0 && past_2_sample > 0 && current_sample > 0)
+    if(past_6_sample > 0 && past_3_sample > 0 && current_sample > 0)
     {
         // if the peak is at "past_2_sample", then both "past_4_sample" and "current_sample" will be less
-        if(past_4_sample < past_2_sample && past_2_sample > current_sample)
+        if(past_6_sample < past_3_sample && past_3_sample > current_sample)
         {
             status = 1;  // max has occurred
         }
@@ -56,18 +58,24 @@ int main()
     init_platform();
     microblaze_disable_interrupts();
 
-    int past_4_ch0_sample  = 0;  // the oldest sample (delay of 4)
+    int past_6_ch0_sample  = 0;  // the oldest sample (delay of 6)
+    int past_5_ch0_sample  = 0;  // past (delay of 5)
+    int past_4_ch0_sample  = 0;  // past (delay of 4)
     int past_3_ch0_sample  = 0;  // previous previous previous sample :) (delay of 3)
     int past_2_ch0_sample  = 0;  // previous previous sample
     int past_ch0_sample    = 0;  // the previous sample
     int current_ch0_sample = 0;  // current sample
 
+    int past_6_ch1_sample  = 0; 
+    int past_5_ch1_sample  = 0;  
     int past_4_ch1_sample  = 0; 
     int past_3_ch1_sample  = 0; 
     int past_2_ch1_sample  = 0;  
     int past_ch1_sample    = 0;  
     int current_ch1_sample = 0; 
 
+    int past_6_ch2_sample  = 0; 
+    int past_5_ch2_sample  = 0;  
     int past_4_ch2_sample  = 0; 
     int past_3_ch2_sample  = 0;    
     int past_2_ch2_sample  = 0;  
@@ -91,16 +99,22 @@ int main()
     while(1)
     {
         // update past samples
+        past_6_ch0_sample = past_5_ch0_sample; 
+        past_5_ch0_sample = past_4_ch0_sample;  
         past_4_ch0_sample = past_3_ch0_sample;
         past_3_ch0_sample = past_2_ch0_sample;
         past_2_ch0_sample = past_ch0_sample;
         past_ch0_sample = current_ch0_sample;
 
+        past_6_ch1_sample = past_5_ch1_sample; 
+        past_5_ch1_sample = past_4_ch1_sample;
         past_4_ch1_sample = past_3_ch1_sample;
         past_3_ch1_sample = past_2_ch1_sample;
         past_2_ch1_sample = past_ch1_sample;
         past_ch1_sample = current_ch1_sample;
 
+        past_6_ch2_sample = past_5_ch2_sample; 
+        past_5_ch2_sample = past_4_ch2_sample;
         past_4_ch2_sample = past_3_ch2_sample;
         past_3_ch2_sample = past_2_ch2_sample;
         past_2_ch2_sample = past_ch2_sample;
@@ -112,29 +126,35 @@ int main()
         getfsl(current_ch2_sample, 2);
 
         // start looking for max of 2nd derivative (ch2)
-        if (max_has_occurred(past_4_ch2_sample, past_2_ch2_sample, current_ch2_sample) == 1) 
+        if (max_has_occurred(past_6_ch2_sample, past_3_ch2_sample, current_ch2_sample) == 1) 
         {
             //xil_printf("max of 2nd deriv occured----------\n\r");
-            if (past_2_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
+            if (past_3_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
             {
                 // look for max of ECG/FIR BP (ch0) until max of moving average is found
-                while(max_has_occurred(past_4_ch1_sample, past_2_ch1_sample, current_ch1_sample) == 0) 
+                while(max_has_occurred(past_6_ch1_sample, past_3_ch1_sample, current_ch1_sample) == 0) 
                 {
                     // update past samples
+                    past_6_ch0_sample = past_5_ch0_sample; 
+                    past_5_ch0_sample = past_4_ch0_sample;  
                     past_4_ch0_sample = past_3_ch0_sample;
                     past_3_ch0_sample = past_2_ch0_sample;
                     past_2_ch0_sample = past_ch0_sample;
                     past_ch0_sample = current_ch0_sample;
 
+                    past_6_ch1_sample = past_5_ch1_sample; 
+                    past_5_ch1_sample = past_4_ch1_sample;
                     past_4_ch1_sample = past_3_ch1_sample;
                     past_3_ch1_sample = past_2_ch1_sample;
                     past_2_ch1_sample = past_ch1_sample;
                     past_ch1_sample = current_ch1_sample;
 
+                    past_6_ch2_sample = past_5_ch2_sample; 
+                    past_5_ch2_sample = past_4_ch2_sample;
                     past_4_ch2_sample = past_3_ch2_sample;
                     past_3_ch2_sample = past_2_ch2_sample;
                     past_2_ch2_sample = past_ch2_sample;
-                    past_ch2_sample = current_ch2_sample;        
+                    past_ch2_sample = current_ch2_sample;    
 
                     // get current sample for all channels
                     getfsl(current_ch0_sample, 0);
@@ -142,7 +162,7 @@ int main()
                     getfsl(current_ch2_sample, 2); 
 
                     // detect max above specified threshold
-                    if(max_has_occurred(past_4_ch0_sample, past_2_ch0_sample, current_ch0_sample) == 1 && past_2_ch0_sample > FIR_BP_THRESHOLD_VALUE)
+                    if(max_has_occurred(past_6_ch0_sample, past_3_ch0_sample, current_ch0_sample) == 1 && past_3_ch0_sample > FIR_BP_THRESHOLD_VALUE)
                     {
                         xil_printf("%d,%d,%d, 1\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 1 to show peak occurs here
                         // what I think is happening here is that because I am using 5 samples in my 
