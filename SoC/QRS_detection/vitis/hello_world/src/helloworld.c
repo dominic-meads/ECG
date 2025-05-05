@@ -24,7 +24,7 @@ Dominic Meads
 #include "xparameters.h"
 
 #define DERIV_TO_MA_DELAY_CYCLES 18
-#define MA_TO_FIR_DELAY_CYCLES   96
+#define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
 #define DERIV_THRESHOLD_VALUE    300
 #define FIR_BP_THRESHOLD_VALUE   1850
 
