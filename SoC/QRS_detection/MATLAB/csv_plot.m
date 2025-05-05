@@ -37,6 +37,8 @@ p = moving_avg;
 L = length(moving_avg);
 ecg_ma_max = find((p(1:L-2)<p(2:L-1))&(p(2:L-1)>p(3:L)))+1;
 
+%% if needed: plot maxes and mins
+
 %% plot detected peaks
 
 % I have double detected peaks.
@@ -51,6 +53,7 @@ hold on;
 h = plot(double_peaks,FIR_bp(double_peaks),'s','MarkerSize',10,...
     'MarkerEdgeColor','red',...
     'MarkerFaceColor',[1 .6 .6]);
+ylim([0 3000]);
 title("Double Detected Peaks");
 
 figure;
@@ -59,6 +62,7 @@ hold on;
 h = plot(QRS_peaks,FIR_bp(QRS_peaks),'s','MarkerSize',10,...
     'MarkerEdgeColor','red',...
     'MarkerFaceColor',[1 .6 .6]);
+ylim([0 3000]);
 title("Detected QRS Peaks");
 
 
