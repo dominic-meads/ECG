@@ -3,9 +3,6 @@ clear all
 clc
 %% Script to read ECG csv file from python program and graph it. 
 
-DERIV_THRESHOLD = 300;
-MA_THRESHOLD = 1850;
-
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
 
 ECG_table = readtable('ECG_data.csv', 'VariableNamingRule', 'preserve');
@@ -17,15 +14,27 @@ n = ECG_table.sample_number;
 
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\MATLAB'
 
+figure;
+plot(n,FIR_bp);
+hold on;
+plot(n,moving_avg);
+hold on;
+plot(n,deriv);
+hold on;
+plot(n,peaks*1000); % increase amplitude to see where peaks are
+xlabel("Sample #");
+ylim([-1000,3000]);
+ylabel("Amplitude");
+legend("FIR_BP", "Moving Average", "Smoothed 2nd Deriv", "Peak Location");
+
 %% find maximums of 2nd derivative signal
-% loop is matlab equivalent of flat_max_has_occurred() function in C code
 p = deriv;  % rename for easier reading in the loop
 L = length(deriv);
 k = 1;
 for i = 10:L
     if p(i-9) > 0 && p(i-5) > 0 && p(i-1) > 0  % detect max in positive portion of signal
         if p(i-9) < p(i-5) && p(i-5) > p(i-1)
-            if p(i-5) > DERIV_THRESHOLD
+            if p(i-5) > 300
                 ecg_diff_2_max(k) = i-5;
                 k = k + 1;
             end
@@ -34,14 +43,13 @@ for i = 10:L
 end 
 
 %% find maximums of MA derivative signal
-% loop is matlab equivalent of flat_max_has_occurred() function in C code
 a = moving_avg; 
 L = length(moving_avg);
 k = 1;
 for i = 10:L
     if a(i-9) > 0 && a(i-5) > 0 && a(i-1) > 0  % detect max in positive portion of signal
         if a(i-9) < a(i-5) && a(i-5) > a(i-1)
-            if a(i-5) > MA_THRESHOLD
+            if a(i-5) > 1850
                 ma_max(k) = i-5;
                 k = k + 1;
             end
@@ -66,6 +74,15 @@ xlabel("Sample #");
 ylim([-1000,3000]);
 ylabel("Amplitude");
 legend("FIR_BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv", "2nd Deriv Maximums", "Peak Location");
+
+
+
+%% find maximums of moving-averaged signal
+a = moving_avg;
+L = length(moving_avg);
+ecg_ma_max = find((a(1:L-2)<a(2:L-1))&(a(2:L-1)>a(3:L)))+1;
+
+%% if needed: plot maxes and mins
 
 %% plot detected peaks
 
