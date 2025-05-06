@@ -25,7 +25,8 @@ Dominic Meads
 
 #define DERIV_TO_MA_DELAY_CYCLES 18
 #define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
-#define DERIV_THRESHOLD_VALUE    300
+#define DERIV_THRESHOLD_VALUE    1200
+#define MA_THRESHOLD_VALUE       4250
 #define FIR_BP_THRESHOLD_VALUE   1850
 
 // function to determine if max has occured in a flatter signal
@@ -170,8 +171,8 @@ int main()
             //xil_printf("max of 2nd deriv occured----------\n\r");
             if (past_4_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
             {
-                // look for max of ECG/FIR BP (ch0) until max of moving average is found
-                while(flat_max_has_occurred(past_8_ch1_sample, past_4_ch1_sample, current_ch1_sample) == 0) 
+                // look for max of ECG/FIR BP (ch0) until max (above threshold) of moving average is found
+                while(flat_max_has_occurred(past_8_ch1_sample, past_4_ch1_sample, current_ch1_sample) == 0 && past_4_ch1_sample <= MA_THRESHOLD_VALUE) 
                 {
                     // update past samples
                     past_8_ch0_sample = past_7_ch0_sample;
