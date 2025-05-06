@@ -3,8 +3,8 @@ clear all
 clc
 %% Script to read ECG csv file from python program and graph it. 
 
-DERIV_THRESHOLD = 300;
-MA_THRESHOLD = 1850;
+DERIV_THRESHOLD = 1200;
+MA_THRESHOLD = 4250;
 
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
 
@@ -49,6 +49,8 @@ for i = 10:L
     end 
 end 
 
+%% graph all signals and peaks
+
 figure;
 plot(n,FIR_bp);
 hold on;
@@ -63,7 +65,7 @@ hold on;
 plot(n,peaks*1000); % increase amplitude to see where peaks are
 title("detected maxes")
 xlabel("Sample #");
-ylim([-1000,3000]);
+ylim([-2000,6000]);
 ylabel("Amplitude");
 legend("FIR_BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv", "2nd Deriv Maximums", "Peak Location");
 
