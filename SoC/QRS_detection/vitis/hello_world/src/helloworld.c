@@ -23,8 +23,8 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
-#define DEBUG_60_BPM
-//#define DEBUG_40_BPM
+//#define DEBUG_60_BPM
+#define DEBUG_40_BPM
 
 #ifdef DEBUG_60_BPM
     #define DERIV_TO_MA_DELAY_CYCLES 18
@@ -32,13 +32,9 @@ Dominic Meads
     #define DERIV_THRESHOLD_VALUE    300
     #define MA_THRESHOLD_VALUE       1500
     #define FIR_BP_THRESHOLD_VALUE   1850
-#elif DEBUG_40_BPM
-    #define DERIV_TO_MA_DELAY_CYCLES 18
-    #define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
-    #define DERIV_THRESHOLD_VALUE    1200
-    #define MA_THRESHOLD_VALUE       4250
-    #define FIR_BP_THRESHOLD_VALUE   1850
-#else
+#endif
+
+#ifdef DEBUG_40_BPM
     #define DERIV_TO_MA_DELAY_CYCLES 18
     #define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
     #define DERIV_THRESHOLD_VALUE    1200
@@ -47,11 +43,13 @@ Dominic Meads
 #endif
 
 
+
 // function to determine if max has occured in a flatter signal
 // it takes the past 8 samples and the current sample to determine if there has been a max
 // a 9 sample window is used to detect peaks in non-impulsive signals such as the moving-average signal
 // "past_8_sample is the oldest of the 9 samples, "past_4_sample" is the 4th oldest, etc...
-int flat_max_has_occurred(int past_8_sample, int past_4_sample, int current_sample)
+// the max must be higher than the "threshold" for the "status" variable to update
+int flat_max_has_occurred(int past_8_sample, int past_4_sample, int current_sample, int threshold)
 {
     int status = 0;
 
@@ -61,7 +59,14 @@ int flat_max_has_occurred(int past_8_sample, int past_4_sample, int current_samp
         // if the peak is at "past_4_sample", then both "past_8_sample" and "current_sample" will be less
         if(past_8_sample < past_4_sample && past_4_sample > current_sample)
         {
-            status = 1;  // max has occurred
+            if(past_4_sample >= threshold)
+            {
+                status = 1;  // max above threshold has occurred                
+            }
+            else 
+            {
+                status = 0; 
+            }
         }
         else
         {
@@ -184,14 +189,14 @@ int main()
         getfsl(current_ch2_sample, 2);
 
         // start looking for max of 2nd derivative (ch2)
-        if (flat_max_has_occurred(past_8_ch2_sample, past_4_ch2_sample, current_ch2_sample) == 1) 
+        if (flat_max_has_occurred(past_8_ch2_sample, past_4_ch2_sample, current_ch2_sample, DERIV_THRESHOLD_VALUE) == 1) 
         {
             //xil_printf("max of 2nd deriv occured----------\n\r");
             if (past_4_ch2_sample >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
             {
                 // look for max of ECG/FIR BP (ch0) until max (above threshold) of moving average is found
                 //while(flat_max_has_occurred(past_8_ch1_sample, past_4_ch1_sample, current_ch1_sample) == 0 && past_4_ch1_sample > MA_THRESHOLD_VALUE)
-                while(flat_max_has_occurred(past_8_ch1_sample, past_4_ch1_sample, current_ch1_sample) == 0) 
+                while(flat_max_has_occurred(past_8_ch1_sample, past_4_ch1_sample, current_ch1_sample, MA_THRESHOLD_VALUE) == 0) 
                 {
                     // update past samples
                     past_8_ch0_sample = past_7_ch0_sample;
