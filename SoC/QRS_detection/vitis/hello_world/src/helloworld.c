@@ -23,8 +23,8 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
-//#define DEBUG_60_BPM
-#define DEBUG_40_BPM
+#define DEBUG_60_BPM
+//#define DEBUG_40_BPM
 
 #define SAMPLE_VECTOR_SIZE 9
 
@@ -163,44 +163,36 @@ int main()
         // start looking for max of 2nd derivative (ch2)
         if (flat_max_has_occurred(ch2_samples[8], ch2_samples[4], ch2_samples[0], DERIV_THRESHOLD_VALUE) == 1) 
         {
-            //xil_printf("max of 2nd deriv occured----------\n\r");
-            if (ch2_samples[4] >= DERIV_THRESHOLD_VALUE)  // max must be greater than threshold
+            // look for max of ECG/FIR BP (ch0) until max (above threshold) of moving average (ch1) is found
+            while(flat_max_has_occurred(ch1_samples[8], ch1_samples[4], ch1_samples[0], MA_THRESHOLD_VALUE) == 0) 
             {
-                // look for max of ECG/FIR BP (ch0) until max (above threshold) of moving average (ch1) is found
-                while(flat_max_has_occurred(ch1_samples[8], ch1_samples[4], ch1_samples[0], MA_THRESHOLD_VALUE) == 0) 
+                // shift to make room for new sample
+                right_shift_array(ch0_samples, SAMPLE_VECTOR_SIZE);
+                right_shift_array(ch1_samples, SAMPLE_VECTOR_SIZE);
+                right_shift_array(ch2_samples, SAMPLE_VECTOR_SIZE);      
+
+                // get current sample for all channels
+                getfsl(ch0_samples[0], 0);
+                getfsl(ch1_samples[0], 1); 
+                getfsl(ch2_samples[0], 2);
+
+                // detect max above specified threshold
+                // look for max over smaller window for max (qrs complex more implusive than MA or 2nd deriv)
+                if(impulsive_max_has_occurred(ch0_samples[4], ch0_samples[2], ch0_samples[0], FIR_BP_THRESHOLD_VALUE) == 1)
                 {
-                    // shift to make room for new sample
-                    right_shift_array(ch0_samples, SAMPLE_VECTOR_SIZE);
-                    right_shift_array(ch1_samples, SAMPLE_VECTOR_SIZE);
-                    right_shift_array(ch2_samples, SAMPLE_VECTOR_SIZE);      
-
-                    // get current sample for all channels
-                    getfsl(ch0_samples[0], 0);
-                    getfsl(ch1_samples[0], 1); 
-                    getfsl(ch2_samples[0], 2);
-
-                    // detect max above specified threshold
-                    // look for max over smaller window for max (qrs complex more implusive than MA or 2nd deriv)
-                    if(impulsive_max_has_occurred(ch0_samples[4], ch0_samples[2], ch0_samples[0], FIR_BP_THRESHOLD_VALUE) == 1)
-                    {
-                        xil_printf("%d,%d,%d, 1\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 1 to show peak occurs here
-                        // what I think is happening here is that because I am using 5 samples in my 
-                        // max_has_occured() function, there are essentially two maxes occuring next
-                        // to each other. Maybe implement some sort of delay after the first one has occured?
-                        // or a flag to ignore other maxes?
-                        //xil_printf("ECG Max occurred ------\n\r");
-                    }
-                    else
-                    {
-                        xil_printf("%d,%d,%d, 0\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 0 to show no peak at current sample
-                    }
+                    xil_printf("%d,%d,%d, 1\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 1 to show peak occurs here
+                    // what I think is happening here is that because I am using 5 samples in my 
+                    // max_has_occured() function, there are essentially two maxes occuring next
+                    // to each other. Maybe implement some sort of delay after the first one has occured?
+                    // or a flag to ignore other maxes?
+                    //xil_printf("ECG Max occurred ------\n\r");
                 }
-                //xil_printf("MA max occured--------\n\r");
+                else
+                {
+                    xil_printf("%d,%d,%d, 0\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 0 to show no peak at current sample
+                }
             }
-            else
-            {
-                xil_printf("%d,%d,%d, 0\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 0 to show no peak at current sample
-            }
+            //xil_printf("MA max occured--------\n\r");
         }
         else 
         {
