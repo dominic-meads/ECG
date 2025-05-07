@@ -23,22 +23,27 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
+#define DEBUG_100_BPM
 //#define DEBUG_60_BPM
-#define DEBUG_40_BPM
+//#define DEBUG_40_BPM
 
 #define SAMPLE_VECTOR_SIZE 21
+#define DERIV_TO_MA_DELAY_CYCLES 18
+#define MA_TO_FIR_DELAY_CYCLES   85  // changed from 96, it seems the greater delay needed for faster heart rates
+
+#ifdef DEBUG_100_BPM
+    #define DERIV_THRESHOLD_VALUE    200
+    #define MA_THRESHOLD_VALUE       600
+    #define FIR_BP_THRESHOLD_VALUE   1850
+#endif
 
 #ifdef DEBUG_60_BPM
-    #define DERIV_TO_MA_DELAY_CYCLES 18
-    #define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
     #define DERIV_THRESHOLD_VALUE    300
     #define MA_THRESHOLD_VALUE       1500
     #define FIR_BP_THRESHOLD_VALUE   1850
 #endif
 
 #ifdef DEBUG_40_BPM
-    #define DERIV_TO_MA_DELAY_CYCLES 18
-    #define MA_TO_FIR_DELAY_CYCLES   89  // changed from 96
     #define DERIV_THRESHOLD_VALUE    1200
     #define MA_THRESHOLD_VALUE       4250
     #define FIR_BP_THRESHOLD_VALUE   1850
