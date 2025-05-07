@@ -23,8 +23,8 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
-//#define DEBUG_60_BPM
-#define DEBUG_40_BPM
+#define DEBUG_60_BPM
+//#define DEBUG_40_BPM
 
 #ifdef DEBUG_60_BPM
     #define DERIV_TO_MA_DELAY_CYCLES 18
@@ -83,7 +83,8 @@ int flat_max_has_occurred(int past_8_sample, int past_4_sample, int current_samp
 // "flat_max_has_occured()" function. Having a shorter window decreases delay from 
 // actual peak to detected peak.
 // "past_4_sample is the oldest of the 5 samples, "past_2_sample" is the 2nd oldest
-int impulsive_max_has_occurred(int past_4_sample, int past_2_sample, int current_sample)
+// the max must be higher than the "threshold" for the "status" variable to update
+int impulsive_max_has_occurred(int past_4_sample, int past_2_sample, int current_sample, int threshold)
 {
     int status = 0;
 
@@ -93,7 +94,14 @@ int impulsive_max_has_occurred(int past_4_sample, int past_2_sample, int current
         // if the peak is at "past_2_sample", then both "past_4_sample" and "current_sample" will be less
         if(past_4_sample < past_2_sample && past_2_sample > current_sample)
         {
-            status = 1;  // max has occurred
+            if(past_2_sample >= threshold)
+            {
+                status = 1;  // max above threshold has occurred
+            }
+            else 
+            {
+                status = 0; 
+            }
         }
         else
         {
@@ -233,7 +241,7 @@ int main()
 
                     // detect max above specified threshold
                     // look for max over smaller window for max (qrs complex more implusive than MA or 2nd deriv)
-                    if(impulsive_max_has_occurred(past_4_ch0_sample, past_2_ch0_sample, current_ch0_sample) == 1 && past_2_ch0_sample > FIR_BP_THRESHOLD_VALUE)
+                    if(impulsive_max_has_occurred(past_4_ch0_sample, past_2_ch0_sample, current_ch0_sample, FIR_BP_THRESHOLD_VALUE) == 1)
                     {
                         xil_printf("%d,%d,%d, 1\n\r",current_ch0_sample,current_ch1_sample,current_ch2_sample);  // print a 1 to show peak occurs here
                         // what I think is happening here is that because I am using 5 samples in my 
