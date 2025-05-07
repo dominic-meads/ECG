@@ -3,8 +3,8 @@ clear all
 clc
 %% Script to read ECG csv file from python program and graph it. 
 
-DERIV_THRESHOLD = 1200;
-MA_THRESHOLD = 4250;
+DERIV_THRESHOLD = 200;
+MA_THRESHOLD = 600;
 
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
 
@@ -22,11 +22,11 @@ cd 'C:\Users\demea\ECG\SoC\QRS_detection\MATLAB'
 p = deriv;  % rename for easier reading in the loop
 L = length(deriv);
 k = 1;
-for i = 10:L
-    if p(i-9) > 0 && p(i-5) > 0 && p(i-1) > 0  % detect max in positive portion of signal
-        if p(i-9) < p(i-5) && p(i-5) > p(i-1)
-            if p(i-5) > DERIV_THRESHOLD
-                ecg_diff_2_max(k) = i-5;
+for i = 21:L
+    if p(i-20) > 0 && p(i-11) > 0 && p(i-1) > 0  % detect max in positive portion of signal
+        if p(i-20) < p(i-11) && p(i-11) > p(i-1)
+            if p(i-11) > DERIV_THRESHOLD
+                ecg_diff_2_max(k) = i-11;
                 k = k + 1;
             end
         end 
@@ -38,11 +38,11 @@ end
 a = moving_avg; 
 L = length(moving_avg);
 k = 1;
-for i = 10:L
-    if a(i-9) > 0 && a(i-5) > 0 && a(i-1) > 0  % detect max in positive portion of signal
-        if a(i-9) < a(i-5) && a(i-5) > a(i-1)
-            if a(i-5) > MA_THRESHOLD
-                ma_max(k) = i-5;
+for i = 21:L
+    if a(i-20) > 0 && a(i-11) > 0 && a(i-1) > 0  % detect max in positive portion of signal
+        if a(i-20) < a(i-11) && a(i-11) > a(i-1)
+            if a(i-11) > MA_THRESHOLD
+                ma_max(k) = i-11;
                 k = k + 1;
             end
         end 
