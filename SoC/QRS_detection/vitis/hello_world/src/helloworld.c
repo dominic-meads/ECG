@@ -23,8 +23,8 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
-#define DEBUG_100_BPM
-//#define DEBUG_60_BPM
+//#define DEBUG_100_BPM
+#define DEBUG_60_BPM
 //#define DEBUG_40_BPM
 
 #define SAMPLE_VECTOR_SIZE 21
@@ -137,6 +137,9 @@ int main()
     int ch1_samples[SAMPLE_VECTOR_SIZE] = {};
     int ch2_samples[SAMPLE_VECTOR_SIZE] = {};
 
+    // status integer to hold whether or not a QRS complex has occured
+    int qrs_status = 0;
+
     // sample 2nd derivative (ch2) DERIV_TO_MA_DELAY_CYCLES times before sampling moving average to align
     for(int i = 0; i < DERIV_TO_MA_DELAY_CYCLES; i++)
     {
@@ -183,7 +186,18 @@ int main()
                 // look for max over smaller window for max (qrs complex more implusive than MA or 2nd deriv)
                 if(impulsive_max_has_occurred(ch0_samples[4], ch0_samples[2], ch0_samples[0], FIR_BP_THRESHOLD_VALUE) == 1)
                 {
-                    xil_printf("%d,%d,%d, 1\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 1 to show peak occurs here
+                    // this if statement rejects double detected peaks in adjacent samples (occuring frequently @ 40-80 bpm)
+                    if(qrs_status == 0)  // if a qrs comlex HAS NOT occurred yet
+                    {
+                        xil_printf("%d,%d,%d, 1\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 1 to show peak occurs here
+                        qrs_status = 1;  // update status to indicated QRS has been detected.
+                    }
+                    else // now on next sample after 1st QRS detection, qrs_status = 1, and the next sample will not print the double detected peak
+                    {
+                        xil_printf("%d,%d,%d, 0\n\r",ch0_samples[0],ch1_samples[0],ch2_samples[0]);  // print a 0 to show no peak at current sample
+                        qrs_status = 0;  // reset QRS status
+                    }
+                   
                     // what I think is happening here is that because I am using 5 samples in my 
                     // max_has_occured() function, there are essentially two maxes occuring next
                     // to each other. Maybe implement some sort of delay after the first one has occured?
