@@ -3,8 +3,8 @@ clear all
 clc
 %% Script to read ECG csv file from python program and graph it. 
 
-DERIV_THRESHOLD = 200;
-MA_THRESHOLD = 600;
+DERIV_THRESHOLD = 300;
+MA_THRESHOLD = 1500;
 
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
 
@@ -71,20 +71,31 @@ legend("FIR_BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv
 
 %% plot detected peaks
 
-% I have double detected peaks.
-% Go through peaks and reject doubles 
+% % I have double detected peaks.
+% % Go through peaks and reject doubles 
 
-double_peaks = find(peaks);
-QRS_peaks = double_peaks(1:2:end); % pick out every other element
+% double_peaks = find(peaks);
+% QRS_peaks = double_peaks(1:2:end); % pick out every other element
+% 
+% figure;
+% plot(n,FIR_bp);
+% hold on;
+% h = plot(double_peaks,FIR_bp(double_peaks),'s','MarkerSize',10,...
+%     'MarkerEdgeColor','red',...
+%     'MarkerFaceColor',[1 .6 .6]);
+% ylim([0 3000]);
+% title("Double Detected Peaks");
+% 
+% figure;
+% plot(n,FIR_bp);
+% hold on;
+% h = plot(QRS_peaks,FIR_bp(QRS_peaks),'s','MarkerSize',10,...
+%     'MarkerEdgeColor','red',...
+%     'MarkerFaceColor',[1 .6 .6]);
+% ylim([0 3000]);
+% title("Detected QRS Peaks");
 
-figure;
-plot(n,FIR_bp);
-hold on;
-h = plot(double_peaks,FIR_bp(double_peaks),'s','MarkerSize',10,...
-    'MarkerEdgeColor','red',...
-    'MarkerFaceColor',[1 .6 .6]);
-ylim([0 3000]);
-title("Double Detected Peaks");
+QRS_peaks = find(peaks);
 
 figure;
 plot(n,FIR_bp);
