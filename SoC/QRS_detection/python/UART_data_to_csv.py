@@ -23,7 +23,13 @@ try:
       # get data from UART 
       raw_serial_byte = ser.readline() # gets data in byte literal
       raw_serial_byte = raw_serial_byte.replace(b'\n', b'')  # remove newline
-      raw_str = str(raw_serial_byte,'UTF-8') # convert to unicode string
+
+      try:
+        raw_str = str(raw_serial_byte,'UTF-8') # convert to unicode string
+      except UnicodeDecodeError as e:
+        print(f"Error: {e}. UART tranmission error. Skipping this value")
+        raw_str = "0,0,0, 0"
+
       raw_list = raw_str.split(",")
       raw_list = list(map(int, raw_list))
       FIR_BP_sample = raw_list[0]
