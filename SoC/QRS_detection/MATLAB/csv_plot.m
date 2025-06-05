@@ -3,8 +3,8 @@ clear all
 clc
 %% Script to read ECG csv file from python program and graph it. 
 
-DERIV_THRESHOLD = 300;
-MA_THRESHOLD = 1500;
+DERIV_THRESHOLD = 0;
+MA_THRESHOLD = 0;
 
 cd 'C:\Users\demea\ECG\SoC\QRS_detection\python'
 
@@ -52,22 +52,26 @@ end
 %% graph all signals and peaks
 
 figure;
-plot(n,FIR_bp);
+plot(n,FIR_bp,LineWidth=2);
 hold on;
-plot(n,moving_avg);
+plot(n,moving_avg,LineWidth=2);
 hold on;
-plot(ma_max, moving_avg(ma_max+1), 'b*');
+plot(ma_max, moving_avg(ma_max+1), 'b*', MarkerSize=10);
 hold on;
-plot(n,deriv);
+plot(n,deriv,LineWidth=2);
 hold on;
-plot(ecg_diff_2_max, deriv(ecg_diff_2_max+1), 'b.');
+plot(ecg_diff_2_max, deriv(ecg_diff_2_max+1), 'b.', MarkerSize=20);
+% uncomment below 2 line to plot peak locations
 hold on;
 plot(n,peaks*1000); % increase amplitude to see where peaks are
-title("detected maxes")
+title("Detected Maxes")
 xlabel("Sample #");
 ylim([-2000,6000]);
 ylabel("Amplitude");
-legend("FIR_BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv", "2nd Deriv Maximums", "Peak Location");
+
+% uncomment below line to plot peak locations
+legend("FIR BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv", "2nd Deriv Maximums", "Peak Location"); %
+%legend("FIR BP", "Moving Average", "Moving Average Maximum", "Smoothed 2nd Deriv", "2nd Deriv Maximums");
 
 %% plot detected peaks
 
@@ -105,6 +109,8 @@ h = plot(QRS_peaks,FIR_bp(QRS_peaks),'s','MarkerSize',10,...
     'MarkerFaceColor',[1 .6 .6]);
 ylim([0 3000]);
 title("Detected QRS Peaks");
+xlabel("Sample #");
+ylabel("Amplitude");
 
 
 
