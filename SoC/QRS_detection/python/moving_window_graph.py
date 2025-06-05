@@ -62,7 +62,12 @@ def animate_window(i):  # moving window of a segment of graph
 
   plt.cla()
 
-  plt.scatter(t[ind_arr], v[ind_arr], color='red', marker='s')
+  # sometimes getting KeyError: '[xxxx] not in index' with t[ind_arr]
+  try :
+    plt.scatter(t[ind_arr-1], v[ind_arr-1], color='red', marker='s')
+  except KeyError as e:
+    print(f"Error: {e}. Skipping this plot point.")
+
   plt.plot(t, v, linewidth=1.5, color = "#68F702")  #plot in neon green
   plt.xlabel('Time (s)')
   plt.ylabel('ECG Amplitude (mV)')
@@ -77,7 +82,7 @@ def animate_window(i):  # moving window of a segment of graph
               ) # add plot text
 
 try:
-  ani = FuncAnimation(plt.gcf(), animate_window, interval=5)
+  ani = FuncAnimation(plt.gcf(), animate_window, interval=5, cache_frame_data=False)
 
   plt.grid(color="#E8E8E7", linestyle='-', linewidth=0.5)
   plt.show()
