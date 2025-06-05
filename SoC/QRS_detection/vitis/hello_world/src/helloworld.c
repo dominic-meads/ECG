@@ -23,13 +23,21 @@ Dominic Meads
 #include "mb_interface.h"
 #include "xparameters.h"
 
+//#define DEBUG_120_BPM
 //#define DEBUG_100_BPM
 #define DEBUG_60_BPM
 //#define DEBUG_40_BPM
 
 #define SAMPLE_VECTOR_SIZE 21
 #define DERIV_TO_MA_DELAY_CYCLES 18
-#define MA_TO_FIR_DELAY_CYCLES   85  // changed from 96, it seems the greater delay needed for faster heart rates
+#define MA_TO_FIR_DELAY_CYCLES   82  // changed from 96, it seems the greater delay needed for faster heart rates
+
+// THIS BLOCK WAS FOR DEBUG AT SPECIFIC BPM, NOT NEEDED ANYMORE?
+#ifdef DEBUG_120_BPM
+    #define DERIV_THRESHOLD_VALUE    65
+    #define MA_THRESHOLD_VALUE       220
+    #define FIR_BP_THRESHOLD_VALUE   1850
+#endif
 
 #ifdef DEBUG_100_BPM
     #define DERIV_THRESHOLD_VALUE    200
@@ -44,8 +52,8 @@ Dominic Meads
 #endif
 
 #ifdef DEBUG_40_BPM
-    #define DERIV_THRESHOLD_VALUE    1200
-    #define MA_THRESHOLD_VALUE       4250
+    #define DERIV_THRESHOLD_VALUE    600
+    #define MA_THRESHOLD_VALUE       2100
     #define FIR_BP_THRESHOLD_VALUE   1850
 #endif
 
@@ -136,6 +144,11 @@ int main()
     int ch0_samples[SAMPLE_VECTOR_SIZE] = {};
     int ch1_samples[SAMPLE_VECTOR_SIZE] = {};
     int ch2_samples[SAMPLE_VECTOR_SIZE] = {};
+
+    // threshold values for maximum detection
+    // int DERIV_THRESHOLD_VALUE  = 0;
+    // int MA_THRESHOLD_VALUE     = 0;
+    // int FIR_BP_THRESHOLD_VALUE = 0;
 
     // status integer to hold whether or not a QRS complex has occured
     int qrs_status = 0;
