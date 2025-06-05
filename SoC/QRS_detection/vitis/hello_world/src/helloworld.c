@@ -136,6 +136,21 @@ void right_shift_array(int * arr, int size)
     arr[0] = 0;
 }
 
+// function to average sample array
+int average_sample_array(int * arr, int size)
+{
+    int avg = 0; 
+
+    for(int i = 0; i < size; i++)
+    {
+        avg += arr[i];
+    }
+
+    avg /= size;
+
+    return avg;
+}
+
 int main()
 {
     init_platform();
@@ -149,7 +164,7 @@ int main()
     // threshold values for maximum detection
     int DERIV_THRESHOLD_VALUE  = 0;
     int MA_THRESHOLD_VALUE     = 0;
-    int FIR_BP_THRESHOLD_VALUE = 1850;
+    int FIR_BP_THRESHOLD_VALUE = 0; 
 
     // status integer to hold whether or not a QRS complex has occured
     int qrs_status = 0;
@@ -201,6 +216,9 @@ int main()
                 getfsl(ch0_samples[0], 0);
                 getfsl(ch1_samples[0], 1); 
                 getfsl(ch2_samples[0], 2);
+
+                // average input ecg signal and increase 15% for threshold
+                FIR_BP_THRESHOLD_VALUE = 1.15 * average_sample_array(ch0_samples, SAMPLE_VECTOR_SIZE);
 
                 // detect max above specified threshold
                 // look for max over smaller window for max (qrs complex more implusive than MA or 2nd deriv)
