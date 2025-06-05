@@ -33,6 +33,7 @@ Dominic Meads
 #define MA_TO_FIR_DELAY_CYCLES   82  // changed from 96, it seems the greater delay needed for faster heart rates
 
 // THIS BLOCK WAS FOR DEBUG AT SPECIFIC BPM, NOT NEEDED ANYMORE?
+// it seems the thresholds for deriv and MA are 30% and 50% of max, respectivley. (for 40-120 BPM range)
 #ifdef DEBUG_120_BPM
     #define DERIV_THRESHOLD_VALUE    65
     #define MA_THRESHOLD_VALUE       220
