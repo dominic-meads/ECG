@@ -25,7 +25,7 @@ Dominic Meads
 
 //#define DEBUG_120_BPM
 //#define DEBUG_100_BPM
-#define DEBUG_60_BPM
+//#define DEBUG_60_BPM
 //#define DEBUG_40_BPM
 
 #define SAMPLE_VECTOR_SIZE 21
@@ -34,29 +34,29 @@ Dominic Meads
 
 // THIS BLOCK WAS FOR DEBUG AT SPECIFIC BPM, NOT NEEDED ANYMORE?
 // it seems the thresholds for deriv and MA are 30% and 50% of max, respectivley. (for 40-120 BPM range)
-#ifdef DEBUG_120_BPM
-    #define DERIV_THRESHOLD_VALUE    65
-    #define MA_THRESHOLD_VALUE       220
-    #define FIR_BP_THRESHOLD_VALUE   1850
-#endif
+// #ifdef DEBUG_120_BPM
+//     #define DERIV_THRESHOLD_VALUE    65
+//     #define MA_THRESHOLD_VALUE       220
+//     #define FIR_BP_THRESHOLD_VALUE   1850
+// #endif
 
-#ifdef DEBUG_100_BPM
-    #define DERIV_THRESHOLD_VALUE    200
-    #define MA_THRESHOLD_VALUE       600
-    #define FIR_BP_THRESHOLD_VALUE   1850
-#endif
+// #ifdef DEBUG_100_BPM
+//     #define DERIV_THRESHOLD_VALUE    200
+//     #define MA_THRESHOLD_VALUE       600
+//     #define FIR_BP_THRESHOLD_VALUE   1850
+// #endif
 
-#ifdef DEBUG_60_BPM
-    #define DERIV_THRESHOLD_VALUE    300
-    #define MA_THRESHOLD_VALUE       1500
-    #define FIR_BP_THRESHOLD_VALUE   1850
-#endif
+// #ifdef DEBUG_60_BPM
+//     #define DERIV_THRESHOLD_VALUE    300
+//     #define MA_THRESHOLD_VALUE       1500
+//     #define FIR_BP_THRESHOLD_VALUE   1850
+// #endif
 
-#ifdef DEBUG_40_BPM
-    #define DERIV_THRESHOLD_VALUE    600
-    #define MA_THRESHOLD_VALUE       2100
-    #define FIR_BP_THRESHOLD_VALUE   1850
-#endif
+// #ifdef DEBUG_40_BPM
+//     #define DERIV_THRESHOLD_VALUE    600
+//     #define MA_THRESHOLD_VALUE       2100
+//     #define FIR_BP_THRESHOLD_VALUE   1850
+// #endif
 
 // function to determine if max has occured in a flatter signal
 // it takes the past 8 samples and the current sample to determine if there has been a max
@@ -147,9 +147,9 @@ int main()
     int ch2_samples[SAMPLE_VECTOR_SIZE] = {};
 
     // threshold values for maximum detection
-    // int DERIV_THRESHOLD_VALUE  = 0;
-    // int MA_THRESHOLD_VALUE     = 0;
-    // int FIR_BP_THRESHOLD_VALUE = 0;
+    int DERIV_THRESHOLD_VALUE  = 0;
+    int MA_THRESHOLD_VALUE     = 0;
+    int FIR_BP_THRESHOLD_VALUE = 1850;
 
     // status integer to hold whether or not a QRS complex has occured
     int qrs_status = 0;
@@ -183,6 +183,12 @@ int main()
         // start looking for max of 2nd derivative (ch2)
         if (flat_max_has_occurred(ch2_samples[20], ch2_samples[10], ch2_samples[0], DERIV_THRESHOLD_VALUE) == 1) 
         {
+            // update "DERIV_THRESHOLD_VALUE" with 30% of new max
+            DERIV_THRESHOLD_VALUE = 0.3 * ch2_samples[10];
+
+            // since MA max will always be greater than the deriv max, can use new deriv max to estimate MA max
+            MA_THRESHOLD_VALUE = 1.5 * ch2_samples[10];  // in testing, MA max is at least >1.5 times the deriv max
+
             // look for max of ECG/FIR BP (ch0) until max (above threshold) of moving average (ch1) is found
             while(flat_max_has_occurred(ch1_samples[20], ch1_samples[10], ch1_samples[0], MA_THRESHOLD_VALUE) == 0) 
             {
