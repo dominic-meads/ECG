@@ -37,8 +37,9 @@ def animate_window(i):  # moving window of a segment of graph
   ind = [i for i, val in enumerate(p) if val != 0]  # find non-zero instances
   ind_arr_temp = np.array(ind)  # create an array
 
-  # REMOVE DOUBLE DETECTED PEAKS (FIX IN SOFTWARE)
-  temp = ind_arr_temp[::2]
+  # uncomment following line to not display double detected peaks
+  #temp = ind_arr_temp[::2]
+  temp = ind_arr_temp # double detected peaks fixed in software code
 
   ind_arr = temp - window_samples  # since in the animate function we are looking at the past samples, subtract the amount of window samples
   last_index = int(y.index[-1]) # get the current last index in the csv file
@@ -55,7 +56,7 @@ def animate_window(i):  # moving window of a segment of graph
   else :
     p_to_p_samples_avg = 500;
   
-  bpm_hz = p_to_p_samples_avg / fs # get frequency of peak interval
+  bpm_hz = fs / p_to_p_samples_avg # get frequency of peak interval
   bpm = 60 * bpm_hz # convert to beats per min
   bpm_str = "%0.2f" % (bpm,) + " BPM" # print two decimal places only and convert to string for graph
 
